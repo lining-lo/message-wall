@@ -1,14 +1,12 @@
 <template>
   <div>
     我是Main
-    <router-view /> 
   </div>
+  <router-view />
 </template>
 
 <script setup>
-import { ref, reactive} from 'vue'
+import { ref, reactive } from 'vue'
 
 </script>
-<style lang='less' scoped>
-
-</style>
+<style lang='less' scoped></style>

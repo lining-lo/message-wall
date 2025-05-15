@@ -1,11 +1,18 @@
 <template>
-  <router-view /> 
+  <router-view />
 </template>
 
 <script setup>
-import { ref, reactive} from 'vue'
+import './assets/fonts/icon/iconfont.js'
+import { ref, reactive } from 'vue'
 
 </script>
-<style lang='less' scoped>
-
+<style lang='less'>
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
 </style>
