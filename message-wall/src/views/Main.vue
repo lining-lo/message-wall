@@ -1,5 +1,8 @@
 <template>
-  <router-view /> 
+  <div>
+    我是Main
+    <router-view /> 
+  </div>
 </template>
 
 <script setup>
