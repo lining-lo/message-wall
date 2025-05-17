@@ -5,10 +5,14 @@
         <div class="label">
             <p @click="selectNode(index)" :class="{ selected: index === selectedLable }" v-for="(item,index) in label[type]">{{ item }}</p>
         </div>
+        <div class="card">
+            <node-card />
+        </div>
     </div>
 </template>
 
 <script setup>
+import NodeCard from '../components/NodeCard.vue'
 import { wallType, label } from '../utils/data'
 import { ref, reactive } from 'vue'
 
