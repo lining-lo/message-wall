@@ -7,7 +7,12 @@
                 v-for="(item, index) in label[type]">{{ item }}</p>
         </div>
         <div class="card">
-            <note-card class="card-item" :note="item" v-for="(item,index) in note.data" :key="index"/>
+            <note-card class="card-item" :note="item" v-for="(item, index) in note.data" :key="index" />
+        </div>
+        <div class="add" :style="{ bottom: btnBottom + 'px' }">
+            <svg class="icon" aria-hidden="true">
+                <use xlink:href="#icon-tianjia-"></use>
+            </svg>
         </div>
     </div>
 </template>
@@ -24,9 +29,33 @@ const type = ref(0)
 //控制选中的词条
 const selectedLable = ref(0)
 
+//控制按钮位置
+const btnBottom = ref(10)
+
+//挂载
+onMounted(() => {
+    //控制添加按钮位置
+    window.addEventListener('scroll', scrollBottom)
+})
+
 //选择词条
 const selectNode = (index) => {
     selectedLable.value = index
+}
+
+//控制滚动条滚到到底部时添加按钮的位置
+const scrollBottom = () => {
+    //距离顶部的高度
+    const scrollTop = document.documentElement.scrollTop
+    //屏幕高度
+    const clientHeight = document.documentElement.clientHeight
+    //内容高度
+    const scrollHeight = document.documentElement.scrollHeight
+    if (scrollTop + clientHeight + 216 >= scrollHeight) {
+        btnBottom.value = scrollTop + clientHeight + 216 - scrollHeight
+    }else{
+        btnBottom.value = 10
+    }
 }
 
 </script>
@@ -67,13 +96,35 @@ const selectNode = (index) => {
             border-radius: 16px;
         }
     }
-    .card{
+
+    .card {
         display: flex;
         flex-wrap: wrap;
         justify-content: center;
         margin-top: 20px;
-        .card-item{
+
+        .card-item {
             margin: 6px;
+        }
+    }
+
+    .add {
+        width: 56px;
+        height: 56px;
+        background: @gray-1;
+        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.08);
+        border-radius: 28px;
+        position: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: @tr;
+        right: 12px;
+        cursor: pointer;
+
+        .icon {
+            color: @gray-10;
+            font-size: 24px;
         }
     }
 }
