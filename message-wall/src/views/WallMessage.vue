@@ -3,18 +3,20 @@
         <p class="title">{{ wallType[type].name }}</p>
         <p class="slogan">{{ wallType[type].slogan }}</p>
         <div class="label">
-            <p @click="selectNode(index)" :class="{ selected: index === selectedLable }" v-for="(item,index) in label[type]">{{ item }}</p>
+            <p @click="selectNode(index)" :class="{ selected: index === selectedLable }"
+                v-for="(item, index) in label[type]">{{ item }}</p>
         </div>
         <div class="card">
-            <node-card />
+            <note-card class="card-item" :note="item" v-for="(item,index) in note.data" :key="index"/>
         </div>
     </div>
 </template>
 
 <script setup>
-import NodeCard from '../components/NodeCard.vue'
+import { note } from '../../mock/index'
+import NoteCard from '../components/NoteCard.vue'
 import { wallType, label } from '../utils/data'
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 //控制墙的性质（0留言墙，1照片墙）
 const type = ref(0)
@@ -23,7 +25,7 @@ const type = ref(0)
 const selectedLable = ref(0)
 
 //选择词条
-const selectNode = (index)=>{
+const selectNode = (index) => {
     selectedLable.value = index
 }
 
@@ -63,6 +65,15 @@ const selectNode = (index)=>{
             font-weight: 600;
             border: 1px solid @gray-1;
             border-radius: 16px;
+        }
+    }
+    .card{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+        .card-item{
+            margin: 6px;
         }
     }
 }

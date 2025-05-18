@@ -1,32 +1,37 @@
 <template>
-    <div class="node-card">
+    <div class="note-card" :style="{backgroundColor: cardColor[note.imgurl]}">
         <div class="top">
-            <p class="time">2025.05.17</p>
-            <p class="label">留言</p>
+            <p class="time">{{formattime(note.moment)}}</p>
+            <p class="label">{{label[note.type][note.label]}}</p>
         </div>
-        <p class="message">秋分好时节，秋雨细无声，天气渐转凉，早晚添衣裳，谨防秋老虎，健康放心上，朋友祝愿你，欢乐度金秋，幸福过一生，秋分悄悄至，天气渐渐好，凡事莫要恼。</p>
+        <p class="message">{{ note.message }}</p>
         <div class="bottom">
             <div class="feedback">
                 <div class="like">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#icon-xiai"></use>
                     </svg>
-                    <span class="value">12</span>
+                    <span class="value">{{note.like}}</span>
                 </div>
                 <div class="comment">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#icon-liuyan"></use>
                     </svg>
-                    <span class="value">4</span>
+                    <span class="value">{{note.comment}}</span>
                 </div>
             </div>
-            <p class="name">我是宋大人</p>
+            <p class="name">{{note.name}}</p>
         </div>
     </div>
 </template>
 
 <script setup>
+import { label,cardColor } from '../utils/data';
+import { formattime } from '../utils/customize';
 import { ref, reactive } from 'vue'
+
+//获取笔记
+const props = defineProps(['note'])
 
 </script>
 <style lang='less' scoped>
@@ -34,7 +39,7 @@ import { ref, reactive } from 'vue'
     font-family: fa;
     src: url("../assets/fonts/zysxt.ttf");
 }
-.node-card {
+.note-card {
     width: 320px;
     height: 240px;
     background-color: #f5d8d7;
