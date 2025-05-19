@@ -42,7 +42,7 @@ const props = defineProps({
 }
 
 .primary{
-    background: @gray-10;
+    background: @gray-1;
     color:@gray-10;
 }
 

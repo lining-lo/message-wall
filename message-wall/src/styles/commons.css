@@ -1,0 +1,38 @@
+body {
+  padding: 0px;
+  margin: 0px;
+  line-height: 1.5;
+  color: #202020;
+  font-size: 14px;
+  background-color: #ffffff;
+  transition: all 0.3s;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+p {
+  padding: 0px;
+  margin: 0px;
+}
+li {
+  list-style: none;
+}
+img {
+  padding: 0px;
+  margin: 0px;
+  display: block;
+}
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+input,
+textarea {
+  outline: none;
+}
+@font-face {
+  font-family: fa;
+  src: url("../assets/fonts/zysxt.ttf");
+}

@@ -9,19 +9,28 @@
         <div class="card">
             <note-card class="card-item" :note="item" v-for="(item, index) in note.data" :key="index" />
         </div>
-        <div class="add" :style="{ bottom: btnBottom + 'px' }">
+        <div v-show="!store.state.popup.isShow" @click="openPopup" class="add" :style="{ bottom: btnBottom + 'px' }">
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tianjia-"></use>
             </svg>
         </div>
+        <popup>
+            <create-card />
+        </popup>
     </div>
 </template>
 
 <script setup>
+import { useStore } from 'vuex'
 import { note } from '../../mock/index'
-import NoteCard from '../components/NoteCard.vue'
 import { wallType, label } from '../utils/data'
+import CreateCard from '../components/CreateCard.vue'
+import Popup from '../components/Popup.vue'
+import NoteCard from '../components/NoteCard.vue'
 import { ref, reactive, onMounted } from 'vue'
+
+//获取store实例
+const store = useStore()
 
 //控制墙的性质（0留言墙，1照片墙）
 const type = ref(0)
@@ -53,9 +62,14 @@ const scrollBottom = () => {
     const scrollHeight = document.documentElement.scrollHeight
     if (scrollTop + clientHeight + 216 >= scrollHeight) {
         btnBottom.value = scrollTop + clientHeight + 216 - scrollHeight
-    }else{
+    } else {
         btnBottom.value = 10
     }
+}
+
+//打开添加弹窗
+const openPopup = () => {
+    store.commit('updateShow')
 }
 
 </script>

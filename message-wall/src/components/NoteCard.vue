@@ -1,8 +1,8 @@
 <template>
-    <div class="note-card" :style="{backgroundColor: cardColor[note.imgurl]}">
+    <div class="note-card" :style="{ backgroundColor: cardColor[note.imgurl] }">
         <div class="top">
-            <p class="time">{{formattime(note.moment)}}</p>
-            <p class="label">{{label[note.type][note.label]}}</p>
+            <p class="time">{{ formattime(note.moment) }}</p>
+            <p class="label">{{ label[note.type][note.label] }}</p>
         </div>
         <p class="message">{{ note.message }}</p>
         <div class="bottom">
@@ -11,22 +11,22 @@
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#icon-xiai"></use>
                     </svg>
-                    <span class="value">{{note.like}}</span>
+                    <span class="value">{{ note.like }}</span>
                 </div>
                 <div class="comment">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#icon-liuyan"></use>
                     </svg>
-                    <span class="value">{{note.comment}}</span>
+                    <span class="value">{{ note.comment }}</span>
                 </div>
             </div>
-            <p class="name">{{note.name}}</p>
+            <p class="name">{{ note.name }}</p>
         </div>
     </div>
 </template>
 
 <script setup>
-import { label,cardColor } from '../utils/data';
+import { label, cardColor } from '../utils/data';
 import { formattime } from '../utils/customize';
 import { ref, reactive } from 'vue'
 
@@ -35,10 +35,6 @@ const props = defineProps(['note'])
 
 </script>
 <style lang='less' scoped>
-@font-face {
-    font-family: fa;
-    src: url("../assets/fonts/zysxt.ttf");
-}
 .note-card {
     width: 320px;
     height: 240px;
