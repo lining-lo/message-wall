@@ -5,8 +5,10 @@
             <p class="logo-name">一刻时光</p>
         </div>
         <div class="menu">
-            <yk-button nom="cprimary" size="max" class="message-wall" >留言墙</yk-button>
-            <yk-button nom="csecondary" size="small" class="photo-wall">照片墙</yk-button>
+            <yk-button @click="changeWall(0)" :nom="wallId === 0 ? 'cprimary' : 'csecondary'"
+                class="message-wall">留言墙</yk-button>
+            <yk-button @click="changeWall(1)" :nom="wallId === 1 ? 'cprimary' : 'csecondary'"
+                class="photo-wall">照片墙</yk-button>
         </div>
         <div class="user">
             <div class="user-head"></div>
@@ -15,8 +17,22 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import YkButton from './YkButton.vue';
 import { ref, reactive } from 'vue'
+
+//获取路由实例
+const router = useRouter()
+
+//墙选中状态(0留言，1照片)
+const wallId = ref(0)
+
+//切换留言墙和照片墙
+const changeWall = (id) => {
+    wallId.value = id
+    router.push('/WallMessage?id=' + id)
+
+}
 
 </script>
 
@@ -50,15 +66,21 @@ import { ref, reactive } from 'vue'
         }
     }
 
-    .menu{
-        .message-wall{
+    .menu {
+        .message-wall {
+            cursor: pointer;
             margin-right: 24px;
+        }
+
+        .photo-wall {
+            cursor: pointer;
         }
     }
 
-    .user{
+    .user {
         width: 200px;
-        .user-head{
+
+        .user-head {
             width: 40px;
             height: 40px;
             border-radius: 50%;

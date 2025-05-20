@@ -1,48 +1,63 @@
 <template>
     <div class="wall-message">
-        <p class="title">{{ wallType[type].name }}</p>
-        <p class="slogan">{{ wallType[type].slogan }}</p>
+        <p class="title">{{ wallType[wallId].name }}</p>
+        <p class="slogan">{{ wallType[wallId].slogan }}</p>
+        <!-- 标签选项 -->
         <div class="label">
             <p @click="selectNode(index)" :class="{ selected: index === selectedLable }"
-                v-for="(item, index) in label[type]">{{ item }}</p>
+                v-for="(item, index) in label[wallId]">{{ item }}</p>
         </div>
-        <div class="card">
+        <!-- 留言墙墙列表 -->
+        <div class="card" v-show="wallId === '0'">
             <note-card :class="{ cardselected: index === store.state.popup.selectedCard }" @click="changeCard(index)"
                 class="card-item" :note="item" v-for="(item, index) in note.data" :key="index" />
         </div>
+        <!-- 照片墙列表 -->
+        <div class="photo" v-show="wallId === '1'">
+            <img :src="`../../static/${photo.data[0].imgurl}.jpg`" alt="">
+        </div>
+        <!-- 创建按钮 -->
         <div v-show="!store.state.popup.isShow" @click="openPopup" class="add" :style="{ bottom: btnBottom + 'px' }">
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tianjia-"></use>
             </svg>
         </div>
+        <!-- 弹窗 -->
         <popup :title="store.state.popup.title">
             <create-card v-if="store.state.popup.selectedCard === -1" />
-            <detail :card="note.data[store.state.popup.selectedCard]" v-else/>
+            <detail :card="note.data[store.state.popup.selectedCard]" v-else />
         </popup>
     </div>
 </template>
 
 <script setup>
 import { useStore } from 'vuex'
-import { note } from '../../mock/index'
+import { note, photo } from '../../mock/index'
 import { wallType, label } from '../utils/data'
 import Detail from '../components/Detail.vue'
 import CreateCard from '../components/CreateCard.vue'
 import Popup from '../components/Popup.vue'
 import NoteCard from '../components/NoteCard.vue'
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+//获取rooute实例
+const route = useRoute()
+
+//获取router实例
+const router = useRouter()
 
 //获取store实例
 const store = useStore()
-
-//控制墙的性质（0留言墙，1照片墙）
-const type = ref(0)
 
 //控制选中的词条
 const selectedLable = ref(0)
 
 //控制按钮位置
 const btnBottom = ref(10)
+
+//墙的类型(0留言,1照片)
+const wallId = computed(() => route.query.id)
 
 
 //挂载
@@ -98,6 +113,8 @@ const changeCard = (index) => {
 </script>
 <style lang='less' scoped>
 .wall-message {
+    min-height: 600px;
+
     .title {
         padding-top: 48px;
         padding-bottom: @padding-8;
