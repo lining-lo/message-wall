@@ -2,7 +2,7 @@
     <transition name="modal">
         <div class="popup" v-if="store.state.popup.isShow">
             <div class="popup-head">
-                <span class="title">写留言</span>
+                <span class="title">{{ props.title }}</span>
                 <svg class="icon" @click="colsePopup" aria-hidden="true">
                     <use xlink:href="#icon-guanbi"></use>
                 </svg>
@@ -18,12 +18,17 @@
 import { useStore } from 'vuex';
 import { ref, reactive } from 'vue'
 
+//获取父组件的参数
+const props = defineProps(['title']);
+
 //获取store实例
 const store = useStore()
 
 //关闭弹窗
 const colsePopup = () => {
-    store.commit('updateShow')
+    store.commit('updateTitle', '写留言')
+    store.commit('updateShow', false)
+    store.commit('updateSelectedCard', -1)
 }
 </script>
 <style lang='less'>

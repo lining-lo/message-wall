@@ -7,15 +7,17 @@
                 v-for="(item, index) in label[type]">{{ item }}</p>
         </div>
         <div class="card">
-            <note-card class="card-item" :note="item" v-for="(item, index) in note.data" :key="index" />
+            <note-card :class="{ cardselected: index === store.state.popup.selectedCard }" @click="changeCard(index)"
+                class="card-item" :note="item" v-for="(item, index) in note.data" :key="index" />
         </div>
         <div v-show="!store.state.popup.isShow" @click="openPopup" class="add" :style="{ bottom: btnBottom + 'px' }">
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-tianjia-"></use>
             </svg>
         </div>
-        <popup>
-            <create-card />
+        <popup :title="store.state.popup.title">
+            <create-card v-if="store.state.popup.selectedCard === -1" />
+            <detail :card="note.data[store.state.popup.selectedCard]" v-else/>
         </popup>
     </div>
 </template>
@@ -24,6 +26,7 @@
 import { useStore } from 'vuex'
 import { note } from '../../mock/index'
 import { wallType, label } from '../utils/data'
+import Detail from '../components/Detail.vue'
 import CreateCard from '../components/CreateCard.vue'
 import Popup from '../components/Popup.vue'
 import NoteCard from '../components/NoteCard.vue'
@@ -40,6 +43,7 @@ const selectedLable = ref(0)
 
 //控制按钮位置
 const btnBottom = ref(10)
+
 
 //挂载
 onMounted(() => {
@@ -69,7 +73,26 @@ const scrollBottom = () => {
 
 //打开添加弹窗
 const openPopup = () => {
-    store.commit('updateShow')
+    store.commit('updateShow', true)
+}
+
+//关闭添加弹窗
+const closePopup = () => {
+    store.commit('updateShow', false)
+    store.commit('updateSelectedCard', -1)
+}
+
+//点击选择卡片
+const changeCard = (index) => {
+    const selectedCard = store.state.popup.selectedCard
+    if (index !== selectedCard) {
+        store.commit('updateTitle', '')
+        store.commit('updateSelectedCard', index)
+        openPopup()
+    } else {
+        store.commit('updateTitle', '写留言')
+        closePopup()
+    }
 }
 
 </script>
@@ -116,9 +139,14 @@ const openPopup = () => {
         flex-wrap: wrap;
         justify-content: center;
         margin-top: 20px;
+        transition: @tr;
 
         .card-item {
             margin: 6px;
+        }
+
+        .cardselected {
+            border: 1px solid @primary-color;
         }
     }
 
