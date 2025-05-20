@@ -49,7 +49,7 @@ export const commont = Mock.mock({
 
 //照片photo
 export const photo = Mock.mock({
-    "data|15":[{
+    "data|19":[{
         //创建时间
         "moment": new Date(),
         //id

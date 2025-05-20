@@ -14,7 +14,7 @@
         </div>
         <!-- 照片墙列表 -->
         <div class="photo" v-show="wallId === '1'">
-            <img :src="`../../static/${photo.data[0].imgurl}.jpg`" alt="">
+            <photo-card class="photo-item" v-for="(item, index) in photo.data" :photo="item" :key="index" />
         </div>
         <!-- 创建按钮 -->
         <div v-show="!store.state.popup.isShow" @click="openPopup" class="add" :style="{ bottom: btnBottom + 'px' }">
@@ -38,6 +38,7 @@ import Detail from '../components/Detail.vue'
 import CreateCard from '../components/CreateCard.vue'
 import Popup from '../components/Popup.vue'
 import NoteCard from '../components/NoteCard.vue'
+import PhotoCard from '../components/PhotoCard.vue'
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -164,6 +165,18 @@ const changeCard = (index) => {
 
         .cardselected {
             border: 1px solid @primary-color;
+        }
+    }
+
+    .photo {
+        width: 88%;
+        margin: 0 auto;
+        columns: 5;
+        column-gap: @padding-4;
+
+        .photo-item {
+            margin-bottom: @padding-4;
+            break-inside: avoid;
         }
     }
 
