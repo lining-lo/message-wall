@@ -29,11 +29,11 @@ const colsePopup = () => {
     store.commit('updateTitle', '写留言')
     store.commit('updateShow', false)
     store.commit('updateSelectedCard', -1)
+    store.commit('updateView', false)
 }
 </script>
 <style lang='less'>
 .modal {
-
     //入场
     &-enter {
         &-from {

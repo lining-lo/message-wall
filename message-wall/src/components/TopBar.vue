@@ -5,9 +5,9 @@
             <p class="logo-name">一刻时光</p>
         </div>
         <div class="menu">
-            <yk-button @click="changeWall(0)" :nom="wallId === 0 ? 'cprimary' : 'csecondary'"
+            <yk-button @click="changeWall(0)" :nom="wallId === '0' ? 'cprimary' : 'csecondary'"
                 class="message-wall">留言墙</yk-button>
-            <yk-button @click="changeWall(1)" :nom="wallId === 1 ? 'cprimary' : 'csecondary'"
+            <yk-button @click="changeWall(1)" :nom="wallId === '1' ? 'cprimary' : 'csecondary'"
                 class="photo-wall">照片墙</yk-button>
         </div>
         <div class="user">
@@ -17,21 +17,31 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import YkButton from './YkButton.vue';
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
+import { useStore } from 'vuex';
 
-//获取路由实例
+//获取store实例
+const store = useStore()
+
+//获取route实例
+const route = useRoute()
+
+//获取router实例
 const router = useRouter()
 
 //墙选中状态(0留言，1照片)
-const wallId = ref(0)
+const wallId = computed(()=> route.query.id || '0')
 
 //切换留言墙和照片墙
 const changeWall = (id) => {
     wallId.value = id
     router.push('/WallMessage?id=' + id)
-
+    store.commit('updateView', false)
+    store.commit('updateShow', false)
+    store.commit('updateSelectedCard', -1)
+    store.commit('updateSelectedLable', -1)
 }
 
 </script>

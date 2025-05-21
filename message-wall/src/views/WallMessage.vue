@@ -4,7 +4,8 @@
         <p class="slogan">{{ wallType[wallId].slogan }}</p>
         <!-- 标签选项 -->
         <div class="label">
-            <p @click="selectNode(index)" :class="{ selected: index === selectedLable }"
+            <p @click="selectNote(-1)" :class="{ selected: -1 === selectedLable }">全部</p>
+            <p @click="selectNote(index)" :class="{ selected: index === selectedLable }"
                 v-for="(item, index) in label[wallId]">{{ item }}</p>
         </div>
         <!-- 留言墙墙列表 -->
@@ -14,7 +15,8 @@
         </div>
         <!-- 照片墙列表 -->
         <div class="photo" v-show="wallId === '1'">
-            <photo-card class="photo-item" v-for="(item, index) in photo.data" :photo="item" :key="index" />
+            <photo-card class="photo-item" @click="changeCard(index)" v-for="(item, index) in photo.data" :photo="item"
+                :key="index" />
         </div>
         <!-- 创建按钮 -->
         <div v-show="!store.state.popup.isShow" @click="openPopup" class="add" :style="{ bottom: btnBottom + 'px' }">
@@ -27,6 +29,8 @@
             <create-card v-if="store.state.popup.selectedCard === -1" />
             <detail :card="note.data[store.state.popup.selectedCard]" v-else />
         </popup>
+        <!-- 大图预览 -->
+        <photo-preview :photos="photoList" v-show="store.state.popup.isView" />
     </div>
 </template>
 
@@ -39,6 +43,7 @@ import CreateCard from '../components/CreateCard.vue'
 import Popup from '../components/Popup.vue'
 import NoteCard from '../components/NoteCard.vue'
 import PhotoCard from '../components/PhotoCard.vue'
+import PhotoPreview from '../components/PhotoPreview.vue'
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
@@ -52,24 +57,28 @@ const router = useRouter()
 const store = useStore()
 
 //控制选中的词条
-const selectedLable = ref(0)
+const selectedLable = computed(() => store.state.popup.selectedLable)
 
 //控制按钮位置
 const btnBottom = ref(10)
 
 //墙的类型(0留言,1照片)
-const wallId = computed(() => route.query.id)
+const wallId = computed(() => route.query.id || '0')
 
+//照片墙的所有照片
+const photoList = ref([])
 
 //挂载
 onMounted(() => {
     //控制添加按钮位置
     window.addEventListener('scroll', scrollBottom)
+    //获取照片墙所有照片
+    getPhotoList()
 })
 
 //选择词条
-const selectNode = (index) => {
-    selectedLable.value = index
+const selectNote = (index) => {
+    store.commit('updateSelectedLable', index)
 }
 
 //控制滚动条滚到到底部时添加按钮的位置
@@ -101,16 +110,30 @@ const closePopup = () => {
 //点击选择卡片
 const changeCard = (index) => {
     const selectedCard = store.state.popup.selectedCard
+    console.log(wallId);
+
     if (index !== selectedCard) {
+        if (wallId.value === '1') {
+            store.commit('updateView', true)
+        }
         store.commit('updateTitle', '')
         store.commit('updateSelectedCard', index)
         openPopup()
     } else {
+        if (wallId.value === '1') {
+            store.commit('updateView', false)
+        }
         store.commit('updateTitle', '写留言')
         closePopup()
     }
 }
 
+//获取照片墙的所有照片
+const getPhotoList = () => {
+    for (let i = 0; i < photo.data.length; i++) {
+        photoList.value.push(photo.data[i].imgurl)
+    }
+}
 </script>
 <style lang='less' scoped>
 .wall-message {
@@ -170,7 +193,7 @@ const changeCard = (index) => {
 
     .photo {
         width: 88%;
-        margin: 0 auto;
+        margin: 20px auto;
         columns: 5;
         column-gap: @padding-4;
 
