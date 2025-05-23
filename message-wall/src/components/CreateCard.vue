@@ -24,12 +24,13 @@
         </div>
         <div class="card-foot">
             <yk-button class="cancel" size="max" nom="secondary">丢弃</yk-button>
-            <yk-button size="max" class="submit">确定</yk-button>
+            <yk-button size="max" class="submit" @click="test">确定</yk-button>
         </div>
     </div>
 </template>
 
 <script setup>
+import axios from 'axios';
 import YkButton from '../components/YkButton.vue'
 import { label, cardColor, colors } from '../utils/data';
 import { ref, reactive } from 'vue'
@@ -48,6 +49,20 @@ const changeColor = (index) => {
 //改变卡片标签
 const changeLabel = (index) => {
     selectedLabel.value = index
+}
+
+//测试接口
+const test = () => {
+    axios.get('http://localhost:3000/findWallPage', {
+        params: {
+            type: 1,
+            label:-1,
+            page: 1,
+            pagesize: 3
+        }
+    }).then(result => {
+        console.log(result);
+    })
 }
 
 </script>
