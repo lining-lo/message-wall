@@ -8,7 +8,7 @@ exports.insertWall = async (request, response) => {
         response.send({
             code: 200,
             message: result
-        })
+        }) 
     })
 }
 

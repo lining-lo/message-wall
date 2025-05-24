@@ -1,20 +1,39 @@
 <template>
     <div class="create-card">
-        <div class="color-list">
-            <div class="color-item" :class="{ colorselected: index === selectedColor }" @click="changeColor(index)"
+        <!-- 颜色列表 -->
+        <div class="color-list" v-show="wallId === '0'">
+            <div class="color-item" :class="{ colorselected: index === data.color }" @click="changeColor(index)"
                 v-for="(item, index) in colors" :key="index" :style="{ background: item }"></div>
         </div>
-        <div class="card-main" :style="{ background: cardColor[selectedColor] }">
-            <textarea class="text" placeholder="留言..." maxlength="96"></textarea>
-            <input class="name" type="text" placeholder="作者">
+        <!-- 文件上传 -->
+        <div class="card-upload" v-show="wallId === '1'">
+            <input class="upload-file" id="file" type="file" accept="image/*" @change="uploadFile">
+            <div class="upload-icon">
+                <svg class="icon" v-if="data.imgurl === ''" aria-hidden="true">
+                    <use xlink:href="#icon-tianjia-"></use>
+                </svg>
+                <svg class="icon" v-if="data.imgurl !== ''" aria-hidden="true">
+                    <use xlink:href="#icon-xiugai"></use>
+                </svg>
+            </div>
+            <div class="upload-img">
+                <img :src="data.imgurl">
+            </div>
         </div>
+        <!-- 留言卡片 -->
+        <div class="card-main" :style="{ background: wallId === '0' ? cardColor[data.color] : cardColor[5] }">
+            <textarea class="text" v-model="data.message" placeholder="留言..." maxlength="96"></textarea>
+            <input class="name" v-model="data.name" type="text" placeholder="作者">
+        </div>
+        <!-- 标签列表 -->
         <div class="card-label">
             <p class="title">选择标签</p>
             <div class="label-list">
-                <p @click="changeLabel(index)" :class="{ labelselected: index === selectedLabel }" class="label-item"
+                <p @click="changeLabel(index)" :class="{ labelselected: index === data.label }" class="label-item"
                     v-for="(item, index) in label[0]" :key="index">{{ item }}</p>
             </div>
         </div>
+        <!-- 免责声明 -->
         <div class="card-statement">
             <p class="title">免责声明</p>
             <p class="text"> 一刻时光是本人独自开发的，为便于与用户交流的留言平台。请不要利用此平台服务制作、上传、下载、复制、发布、传播或者转载如下内容：<br> 1、反对宪法所确定的基本原则的；<br>
@@ -22,47 +41,81 @@
                 5、破坏国家宗教政策，宣扬邪教和封建迷信的；<br> 6、散布谣言，扰乱社会秩序，破坏社会稳定的；<br> 7、散布淫秽、色情、赌博、暴力、凶杀、恐怖或者教唆犯罪的；<br>
                 8、侮辱或者诽谤他人，侵害他人合法权益的；<br> 9、含有法律、行政法规禁止的其他内容的信息。 </p>
         </div>
+        <!-- 底部按钮 -->
         <div class="card-foot">
             <yk-button class="cancel" size="max" nom="secondary">丢弃</yk-button>
-            <yk-button size="max" class="submit" @click="test">确定</yk-button>
+            <yk-button size="max" class="submit" @click="submit">确定</yk-button>
         </div>
     </div>
 </template>
 
 <script setup>
 import axios from 'axios';
-import YkButton from '../components/YkButton.vue'
+import { getObjectURL } from '../utils/customize';
 import { label, cardColor, colors } from '../utils/data';
-import { ref, reactive } from 'vue'
+import YkButton from '../components/YkButton.vue'
+import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
+import { useRoute } from 'vue-router'
+import { useStore } from 'vuex';
 
-//选择的卡片颜色
-const selectedColor = ref(0)
+//获取当前vue实例
+const { proxy } = getCurrentInstance()
 
-//选择的卡片标签
-const selectedLabel = ref(0)
+//获取rooute实例
+const route = useRoute()
+
+//获取store实例
+const store = useStore()
+
+//墙的类型(0留言,1照片)
+const wallId = computed(() => route.query.id || '0')
+
+//卡片数据
+const data = reactive({
+    //卡片类型(0留言1照片)
+    type: parseInt(wallId.value),
+    //卡片信息
+    message: '',
+    //留言者
+    name: '匿名',
+    //用户id
+    userId: 'user001',
+    //创建时间
+    moment: new Date(),
+    //选择的卡片标签
+    label: 0,
+    //选择的卡片颜色
+    color: 0,
+    //图片路径
+    imgurl: ''
+})
+
+//挂载
+onMounted(() => {
+
+})
 
 //改变卡片颜色
 const changeColor = (index) => {
-    selectedColor.value = index
+    data.color = index
 }
 
 //改变卡片标签
 const changeLabel = (index) => {
-    selectedLabel.value = index
+    data.label = index
 }
 
-//测试接口
-const test = () => {
-    axios.get('http://localhost:3000/findWallPage', {
-        params: {
-            type: 1,
-            label:-1,
-            page: 1,
-            pagesize: 3
-        }
-    }).then(result => {
-        console.log(result);
-    })
+//上传图片
+const uploadFile = () => {
+    let file = getObjectURL(document.getElementById("file").files[0]);
+    data.imgurl = file
+}
+
+//创建卡片
+const submit = async () => {
+    const result = await proxy.$api.insertWall(data)
+    console.log(result);
+    
 }
 
 </script>
@@ -70,6 +123,56 @@ const test = () => {
 .create-card {
     padding: 0 @padding-20 120px;
     position: relative;
+
+    .card-upload {
+        padding-bottom: 20px;
+        position: relative;
+        min-height: 60px;
+
+        .upload-file {
+            position: absolute;
+            z-index: 10;
+            top: -25px;
+            height: 90px;
+            width: 64px;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-icon {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 64px;
+            height: 64px;
+            border: 1px solid #fff;
+            border-radius: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.2);
+
+            .icon {
+                font-size: 20px;
+                color: #fff;
+            }
+        }
+
+        .upload-img {
+            max-height: 200px;
+            width: 100%;
+            background: #333;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+
+            img {
+                width: 100%;
+            }
+        }
+
+    }
 
     .color-list {
         padding-bottom: @padding-12;
