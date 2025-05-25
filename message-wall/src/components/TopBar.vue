@@ -56,7 +56,7 @@ const changeWall = (id) => {
     position: sticky;
     top: 0;
     left: 0;
-    z-index: 9999;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;

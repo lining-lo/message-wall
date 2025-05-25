@@ -112,10 +112,13 @@ const uploadFile = () => {
 }
 
 //创建卡片
-const submit = async () => {
-    const result = await proxy.$api.insertWall(data)
-    console.log(result);
-    
+// const submit = async () => {
+//     const result = await proxy.$api.insertWall(data)
+//     console.log(result);
+
+// }
+const submit = () => {
+    proxy.$message({ message: '这是一条测试信息',type:'error' })
 }
 
 </script>
