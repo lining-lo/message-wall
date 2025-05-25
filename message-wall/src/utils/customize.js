@@ -33,3 +33,8 @@ export const getObjectURL = (file) => {
     }
     return url;
 }
+
+//动态获取assets中的图片地址
+export const getAssetURL = (image) => {
+    return new URL(`../assets/images/${image}`, import.meta.url).href
+}

@@ -53,3 +53,15 @@ export const portrait = [
     'linear-gradient(180deg,#FFDC83 0%,#F88816 100%)',
     'linear-gradient(180deg,#FFBA8D 1%,#EB6423 100%)',
 ];
+
+//没有卡片|照片的提示信息
+export const noneTip = [
+    {
+        url: 'card.svg',
+        msg: '还没有留言，快贴上第一张吧'
+    },
+    {
+        url: 'photo.svg',
+        msg: '还没有照片，快贴上第一张吧'
+    }
+]
