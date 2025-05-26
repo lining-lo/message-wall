@@ -9,24 +9,24 @@
                 v-for="(item, index) in label[wallId]">{{ item }}</p>
         </div>
         <!-- 留言墙墙列表 -->
-        <!-- <div class="card" v-show="wallId === '0'">
+        <div class="card" v-show="wallId === '0'">
             <note-card :class="{ cardselected: index === store.state.popup.selectedCard }" @click="changeCard(index)"
-                class="card-item" :note="item" v-for="(item, index) in note.data" :key="index" />
-        </div> -->
+                class="card-item" :note="item" v-for="(item, index) in cardList" :key="index" />
+        </div>
         <!-- 照片墙列表 -->
-        <!-- <div class="photo" v-show="wallId === '1'">
+        <div class="photo" v-show="wallId === '1'">
             <photo-card class="photo-item" @click="changeCard(index)" v-for="(item, index) in photo.data" :photo="item"
                 :key="index" />
-        </div> -->
+        </div>
         <!-- 卡片的状态 -->
-        <div class="none" v-show="isLoading === -1">
+        <div class="none" v-show="isLoading === 0">
             <img class="none-img" :src="getAssetURL(noneTip[parseInt(wallId)].url)" alt="">
             <p class="none-msg">{{ noneTip[parseInt(wallId)].msg }}</p>
         </div>
-        <div class="loading" v-show="isLoading === 0">
+        <div class="loading" v-show="isLoading === 1">
             <div class="lottie"></div>
         </div>
-        <p class="finish" v-show="isLoading === 1">没有更多...</p>
+        <p class="finish" v-show="isLoading === 2">没有更多...</p>
         <!-- 创建按钮 -->
         <div v-show="!store.state.popup.isShow" @click="openPopup" class="add" :style="{ bottom: btnBottom + 'px' }">
             <svg class="icon" aria-hidden="true">
@@ -35,8 +35,8 @@
         </div>
         <!-- 弹窗 -->
         <popup :title="store.state.popup.title">
-            <create-card v-if="store.state.popup.selectedCard === -1" />
-            <detail :card="note.data[store.state.popup.selectedCard]" v-else />
+            <create-card v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList" @initCardList="selectNote" />
+            <detail :card="cardList[store.state.popup.selectedCard]" v-else />
         </popup>
         <!-- 大图预览 -->
         <photo-preview :photos="photoList" v-show="store.state.popup.isView" />
@@ -56,8 +56,11 @@ import NoteCard from '../components/NoteCard.vue'
 import PhotoCard from '../components/PhotoCard.vue'
 import PhotoPreview from '../components/PhotoPreview.vue'
 import { useStore } from 'vuex'
-import { ref, reactive, onMounted, computed, nextTick } from 'vue'
+import { ref, reactive, onMounted, computed, nextTick, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+//获取当前vue实例
+const { proxy } = getCurrentInstance()
 
 //获取rooute实例
 const route = useRoute()
@@ -80,22 +83,36 @@ const wallId = computed(() => route.query.id || '0')
 //照片墙的所有照片
 const photoList = ref([])
 
-//控制卡片的状态(-1没有卡片,0加载中,1到底了)
-const isLoading = ref(0)
+//留言墙的所有留言
+const cardList = ref([])
+
+//控制卡片的状态(-1初始,0没有卡片,1加载中,2到底了)
+const isLoading = ref(1)
+
+//当前页
+const page = ref(1)
+
+//分页条数
+const pagesize = ref(8)
 
 //挂载
 onMounted(() => {
     //控制添加按钮位置
     window.addEventListener('scroll', scrollBottom)
     //获取照片墙所有照片
-    getPhotoList()
+    // getPhotoList()
     //加载动画
     loading()
+    //获取墙列表
+    getCardList()
 })
 
 //选择词条
 const selectNote = (index) => {
     store.commit('updateSelectedLable', index)
+    cardList.value = []
+    page.value = 1
+    getCardList()
 }
 
 //控制滚动条滚到到底部时添加按钮的位置
@@ -106,10 +123,17 @@ const scrollBottom = () => {
     const clientHeight = document.documentElement.clientHeight
     //内容高度
     const scrollHeight = document.documentElement.scrollHeight
+
+    //让添加按钮始终位于footbar上方
     if (scrollTop + clientHeight + 216 >= scrollHeight) {
         btnBottom.value = scrollTop + clientHeight + 216 - scrollHeight
     } else {
         btnBottom.value = 10
+    }
+
+    //加载更多
+    if (scrollTop + clientHeight + 10 >= scrollHeight) {
+        getCardList()
     }
 }
 
@@ -144,15 +168,15 @@ const changeCard = (index) => {
 }
 
 //获取照片墙的所有照片
-const getPhotoList = () => {
-    for (let i = 0; i < photo.data.length; i++) {
-        photoList.value.push(photo.data[i].imgurl)
-    }
-}
+// const getPhotoList = () => {
+//     for (let i = 0; i < photo.data.length; i++) {
+//         photoList.value.push(photo.data[i].imgurl)
+//     }
+// }
 
 //lottie加载动画
 const loading = () => {
-    if (isLoading.value === 0) {
+    if (isLoading.value === 1) {
         nextTick(async () => {
             const params = {
                 container: document.querySelector(".lottie"),//需要渲染的dom
@@ -163,6 +187,48 @@ const loading = () => {
             }
             lottie.loadAnimation(params)
         })
+    }
+}
+
+//获取墙列表
+const getCardList = async () => {
+    if (page.value > 0) {
+        //设置加载状态
+        isLoading.value = 1
+        //获取请求参数
+        const params = {
+            page: page.value,
+            pagesize: pagesize.value,
+            type: parseInt(wallId.value),
+            label: selectedLable.value
+        }
+        //发送请求
+        const { data } = await proxy.$api.findWallPage(params)
+        //获取墙列表
+        cardList.value = cardList.value.concat(data.message)
+        console.log('cardList', cardList.value);
+        //单独获取照片路径数组
+        if (params.type === 1) {
+            for (let i = 0; i < data.message.length; i++) {
+                photoList.value.push(data.message[i].imgurl)
+            }
+            console.log('photoList', photoList.value);
+        }
+        //设置下一页
+        if (data.message.length) {
+            page.value++
+        } else {
+            page.value = 0
+        }
+        //设置卡片状态(-1初始,0没有卡片,1加载中,2到底了)
+        if (cardList.value.length > 0) {
+            isLoading.value = -1
+            if (page.value === 0) {
+                isLoading.value = 2
+            }
+        } else {
+            isLoading.value = 0
+        }
     }
 }
 

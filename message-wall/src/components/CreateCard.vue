@@ -43,7 +43,7 @@
         </div>
         <!-- 底部按钮 -->
         <div class="card-foot">
-            <yk-button class="cancel" size="max" nom="secondary">丢弃</yk-button>
+            <yk-button class="cancel" size="max" nom="secondary" @click="colsePopup">丢弃</yk-button>
             <yk-button size="max" class="submit" @click="submit">确定</yk-button>
         </div>
     </div>
@@ -58,8 +58,12 @@ import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex';
 
+
 //获取当前vue实例
 const { proxy } = getCurrentInstance()
+
+//获取父组件的自定义事件
+const emit = defineEmits(['getCardList', 'initCardList'])
 
 //获取rooute实例
 const route = useRoute()
@@ -111,14 +115,24 @@ const uploadFile = () => {
     data.imgurl = file
 }
 
-//创建卡片
-// const submit = async () => {
-//     const result = await proxy.$api.insertWall(data)
-//     console.log(result);
+//关闭弹窗
+const colsePopup = () => {
+    store.commit('updateTitle', '写留言')
+    store.commit('updateShow', false)
+    store.commit('updateSelectedCard', -1)
+    store.commit('updateView', false)
+}
 
-// }
-const submit = () => {
-    proxy.$message({ message: '这是一条测试信息',type:'error' })
+//创建卡片
+const submit = async () => {
+    //发送请求
+    const result = await proxy.$api.insertWall(data)
+    //重新获取墙列表
+    emit('initCardList',-1)
+    //关闭弹窗
+    colsePopup()
+    //提示用户
+    proxy.$message({ message: '创建成功', type: 'success' })
 }
 
 </script>

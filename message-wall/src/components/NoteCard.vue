@@ -1,5 +1,5 @@
 <template>
-    <div class="note-card" :style="{ backgroundColor: cardColor[note.imgurl] }">
+    <div class="note-card" :style="{ backgroundColor: cardColor[note.color] }">
         <div class="top">
             <p class="time">{{ formattime(note.moment) }}</p>
             <p class="label">{{ label[note.type][note.label] }}</p>
@@ -11,13 +11,13 @@
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#icon-xiai"></use>
                     </svg>
-                    <span class="value">{{ note.like }}</span>
+                    <span class="value">{{ note.like[0].count }}</span>
                 </div>
                 <div class="comment">
                     <svg class="icon" aria-hidden="true">
                         <use xlink:href="#icon-liuyan"></use>
                     </svg>
-                    <span class="value">{{ note.comment }}</span>
+                    <span class="value">{{ note.commentCount[0].count }}</span>
                 </div>
             </div>
             <p class="name">{{ note.name }}</p>

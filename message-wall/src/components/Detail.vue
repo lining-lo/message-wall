@@ -1,10 +1,13 @@
 <template>
     <div class="detail">
+        <!-- 头部按钮 -->
         <div class="detail-head">
             <p class="revoke">联系墙主撕掉该便签</p>
             <p class="report">举报</p>
         </div>
+        <!-- 留言卡片 -->
         <note-card :note="card" />
+        <!-- 评论表单 -->
         <div class="detail-form">
             <textarea class="text" placeholder="请输入..." />
             <div class="bottom">
@@ -12,6 +15,7 @@
                 <yk-button>确定</yk-button>
             </div>
         </div>
+        <!-- 评论区 -->
         <div class="detail-comment">
             <p class="comment-title">评论{{props.card.comment}}</p>
             <div class="comment-item" v-for="(item, index) in commont.data">
