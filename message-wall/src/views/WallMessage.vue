@@ -10,7 +10,7 @@
         </div>
         <!-- 留言墙墙列表 -->
         <div class="card" v-show="wallId === '0'">
-            <note-card :class="{ cardselected: index === store.state.popup.selectedCard }" @click="changeCard(index)"
+            <note-card :class="{ cardselected: index === store.state.popup.selectedCard }" @toDetail="changeCard(index)"
                 class="card-item" :note="item" v-for="(item, index) in cardList" :key="index" />
         </div>
         <!-- 照片墙列表 -->

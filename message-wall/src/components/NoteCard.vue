@@ -4,11 +4,12 @@
             <p class="time">{{ formattime(note.moment) }}</p>
             <p class="label">{{ label[note.type][note.label] }}</p>
         </div>
-        <p class="message">{{ note.message }}</p>
+        <p class="message" @click="toDetail">{{ note.message }}</p>
         <div class="bottom">
             <div class="feedback">
                 <div class="like">
-                    <svg class="icon" aria-hidden="true">
+                    <svg class="icon" @click="addLike" :class="{ addlike: isLike !== 0 }"
+                        aria-hidden="true">
                         <use xlink:href="#icon-xiai"></use>
                     </svg>
                     <span class="value">{{ note.like[0].count }}</span>
@@ -28,10 +29,44 @@
 <script setup>
 import { label, cardColor } from '../utils/data';
 import { formattime } from '../utils/customize';
-import { ref, reactive } from 'vue'
+import { ref, reactive, getCurrentInstance } from 'vue'
 
-//获取笔记
+//获取当前vue实例
+const { proxy } = getCurrentInstance()
+
+//获取父组件传递的参数
 const props = defineProps(['note'])
+
+//获取父组件传递的方法
+const emit = defineEmits(['toDetail'])
+
+//是否点赞
+const isLike = ref(props.note.isLike[0].count)
+
+//点击卡片显示详情
+const toDetail = () => {
+    emit('toDetail')
+}
+
+//点赞
+const addLike = async () => {
+    //点过一次赞不允许再点赞
+    if (!isLike.value) {
+        isLike.value++
+        //获取参数
+        const data = {
+            wallId: props.note.id,
+            userId: 'user001',
+            type: props.note.type,
+            moment: new Date()
+        }
+        //插入一条点赞数据
+        const result = await proxy.$api.insertFeedBack(data)
+        //界面反馈
+        props.note.like[0].count++
+    }
+
+}
 
 </script>
 <style lang='less' scoped>
@@ -84,6 +119,10 @@ const props = defineProps(['note'])
                     transition: @tr;
                     font-size: @size-16;
                     color: @gray-3;
+
+                    &.addlike {
+                        color: @like;
+                    }
 
                     &:hover {
                         color: @like;

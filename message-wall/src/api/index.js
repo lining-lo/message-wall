@@ -5,8 +5,16 @@ export default {
     insertWall(data) {
         return http.post('/insertWall', data)
     },
+
     //分页查询墙列表
     findWallPage(params) {
         return http.get('/findWallPage', { params })
-    }
+    },
+
+    //新建反馈（点赞、举报、撤销）
+    insertFeedBack(data) {
+        return http.post('/insertFeedBack', data)
+    },
+
+
 }
