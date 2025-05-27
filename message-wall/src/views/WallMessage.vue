@@ -35,8 +35,9 @@
         </div>
         <!-- 弹窗 -->
         <popup :title="store.state.popup.title">
-            <create-card v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList" @initCardList="selectNote" />
-            <detail :card="cardList[store.state.popup.selectedCard]" v-else />
+            <create-card v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList"
+                @initCardList="selectNote" />
+            <detail :card="cardList[store.state.popup.selectedCard]" :comments="comments" @updateList="updateList" v-else />
         </popup>
         <!-- 大图预览 -->
         <photo-preview :photos="photoList" v-show="store.state.popup.isView" />
@@ -95,6 +96,9 @@ const page = ref(1)
 //分页条数
 const pagesize = ref(8)
 
+//所有评论
+const comments = ref([])
+
 //挂载
 onMounted(() => {
     //控制添加按钮位置
@@ -105,6 +109,8 @@ onMounted(() => {
     loading()
     //获取墙列表
     getCardList()
+    //获取用户
+    getUser()
 })
 
 //选择词条
@@ -113,6 +119,11 @@ const selectNote = (index) => {
     cardList.value = []
     page.value = 1
     getCardList()
+    //关闭弹窗
+    store.commit('updateTitle', '写留言')
+    store.commit('updateShow', false)
+    store.commit('updateSelectedCard', -1)
+    store.commit('updateView', false)
 }
 
 //控制滚动条滚到到底部时添加按钮的位置
@@ -158,6 +169,8 @@ const changeCard = (index) => {
         store.commit('updateTitle', '')
         store.commit('updateSelectedCard', index)
         openPopup()
+        //获取评论列表
+        getComments()
     } else {
         if (wallId.value === '1') {
             store.commit('updateView', false)
@@ -230,6 +243,38 @@ const getCardList = async () => {
             isLoading.value = 0
         }
     }
+}
+
+//获取用户
+const getUser = () => {
+    if (!localStorage.getItem('user')) {
+        localStorage.setItem('user', '游客' + Math.floor(Math.random() * 100000000))
+    }
+}
+
+//获取留言列表
+const getComments = async () => {
+    //获取评论的参数
+    const params = reactive({
+        wallId: cardList.value[store.state.popup.selectedCard].id,
+        page: 1,
+        pagesize: 100
+    })
+    //发送请求
+    const result = await proxy.$api.findCommentPage(params)
+    //收集数据
+    comments.value = result.data.message
+    console.log('comments', comments.value);
+}
+
+//发送评论时更新列表
+const updateList = ()=>{
+    //重新获取留言列表
+    getComments()
+    //重新获取卡片列表
+    cardList.value = []
+    page.value = 1
+    getCardList()
 }
 
 </script>

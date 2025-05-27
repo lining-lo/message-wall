@@ -56,7 +56,7 @@ const addLike = async () => {
         //获取参数
         const data = {
             wallId: props.note.id,
-            userId: 'user001',
+            userId: localStorage.getItem('user'),
             type: props.note.type,
             moment: new Date()
         }

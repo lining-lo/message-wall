@@ -9,23 +9,23 @@
         <note-card :note="card" />
         <!-- 评论表单 -->
         <div class="detail-form">
-            <textarea class="text" placeholder="请输入..." />
+            <textarea class="text" v-model="data.comment" placeholder="请输入..." />
             <div class="bottom">
-                <input class="signature" placeholder="签名" type="text">
-                <yk-button>确定</yk-button>
+                <input class="signature" v-model="data.name" placeholder="签名" readonly type="text">
+                <yk-button class="submit" :class="{ disabled: !isAllow }" @click="submit">发送</yk-button>
             </div>
         </div>
         <!-- 评论区 -->
         <div class="detail-comment">
-            <p class="comment-title">评论{{props.card.comment}}</p>
-            <div class="comment-item" v-for="(item, index) in commont.data">
-                <div class="avatar" :style="{backgroundImage: portrait[item.imgurl]}"></div>
+            <p class="comment-title">评论{{ props.card.comment }}</p>
+            <div class="comment-item" v-for="(item, index) in comments">
+                <div class="avatar" :style="{ backgroundImage: portrait[item.imgurl] }"></div>
                 <div class="content">
                     <div class="userInfo">
                         <p class="name">{{ item.name }}</p>
                         <p class="time">{{ formattime(item.moment) }}</p>
                     </div>
-                    <p class="comment">{{ item.message }}</p>
+                    <p class="comment">{{ item.comment }}</p>
                 </div>
             </div>
         </div>
@@ -38,10 +38,53 @@ import { portrait } from '../utils/data';
 import { commont } from '../../mock';
 import YkButton from './YkButton.vue';
 import NoteCard from './NoteCard.vue';
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed, getCurrentInstance, onMounted } from 'vue'
+import { useRoute } from 'vue-router';
+
+//获取当前vue实例
+const { proxy } = getCurrentInstance()
 
 //获取父组件参数
-const props = defineProps(['card'])
+const props = defineProps(['card','comments'])
+
+//获取父组件方法
+const emit = defineEmits(['updateList'])
+
+//获取rooute实例
+const route = useRoute()
+
+//墙的类型(0留言,1照片)
+const wallType = computed(() => route.query.id || '0')
+
+//发送评论的参数
+const data = reactive({
+    wallId: props.card.id,
+    userId: localStorage.getItem('user'),
+    imgurl: props.card.imgurl,
+    comment: '',
+    name: localStorage.getItem('user'),
+    moment: new Date()
+})
+
+//控制是否允许发送
+const isAllow = computed(() => data.comment ? true : false)
+
+//挂载
+onMounted(()=>{
+
+})
+
+//发送评论
+const submit = async () => {
+    if (isAllow.value) {
+        await proxy.$api.insertComment(data)
+        //更新留言列表
+        emit('updateList')
+        //清空信息
+        data.comment = ''
+    }
+}
+
 
 </script>
 <style lang='less' scoped>
@@ -95,11 +138,20 @@ const props = defineProps(['card'])
                 border: 1px solid rgba(148, 148, 148, 1);
                 line-height: 20px;
             }
+
+            .submit {
+                cursor: pointer;
+
+                &.disabled {
+                    cursor: not-allowed;
+                }
+            }
         }
     }
 
     .detail-comment {
         margin-top: 30px;
+
         .comment-title {
             padding-bottom: 20px;
             font-size: 16px;

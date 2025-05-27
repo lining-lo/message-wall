@@ -23,7 +23,7 @@
         <!-- 留言卡片 -->
         <div class="card-main" :style="{ background: wallId === '0' ? cardColor[data.color] : cardColor[5] }">
             <textarea class="text" v-model="data.message" placeholder="留言..." maxlength="96"></textarea>
-            <input class="name" v-model="data.name" type="text" placeholder="作者">
+            <input class="name" v-model="data.name" type="text" placeholder="作者" readonly>
         </div>
         <!-- 标签列表 -->
         <div class="card-label">
@@ -81,9 +81,9 @@ const data = reactive({
     //卡片信息
     message: '',
     //留言者
-    name: '匿名',
+    name: localStorage.getItem('user'),
     //用户id
-    userId: 'user001',
+    userId: localStorage.getItem('user'),
     //创建时间
     moment: new Date(),
     //选择的卡片标签

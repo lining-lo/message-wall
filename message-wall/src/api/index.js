@@ -16,5 +16,13 @@ export default {
         return http.post('/insertFeedBack', data)
     },
 
+    //新建评论
+    insertComment(data) {
+        return http.post('/insertComment', data)
+    },
 
+    //倒叙分页查询墙的评论
+    findCommentPage(params) {
+        return http.get('/findCommentPage', { params })
+    }
 }
