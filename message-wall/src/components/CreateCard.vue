@@ -30,7 +30,7 @@
             <p class="title">选择标签</p>
             <div class="label-list">
                 <p @click="changeLabel(index)" :class="{ labelselected: index === data.label }" class="label-item"
-                    v-for="(item, index) in label[0]" :key="index">{{ item }}</p>
+                    v-for="(item, index) in label[parseInt(wallId)]" :key="index">{{ item }}</p>
             </div>
         </div>
         <!-- 免责声明 -->

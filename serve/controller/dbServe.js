@@ -8,7 +8,7 @@ exports.insertWall = async (request, response) => {
         response.send({
             code: 200,
             message: result
-        }) 
+        })
     })
 }
 
@@ -91,7 +91,7 @@ exports.findWallPage = async (request, response) => {
             //评论总数
             result[i].commentCount = await db.commentCount(result[i].id)
             //是否点赞
-            result[i].isLike = await db.isLike(result[i].id, result[i].userId)
+            result[i].isLike = await db.isLike(result[i].id, data.userId)
         }
 
         //返回结果

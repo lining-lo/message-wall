@@ -64,6 +64,8 @@ const addLike = async () => {
         props.note.like[0].count++
         props.note.isLike[0].count++
     }
+    console.log(props.note);
+    
 }
 
 </script>

@@ -228,7 +228,8 @@ const getCardList = async () => {
             page: page.value,
             pagesize: pagesize.value,
             type: parseInt(wallId.value),
-            label: selectedLable.value
+            label: selectedLable.value,
+            userId: localStorage.getItem('user')
         }
         //发送请求
         const { data } = await proxy.$api.findWallPage(params)
