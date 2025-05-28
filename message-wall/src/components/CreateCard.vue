@@ -125,14 +125,33 @@ const colsePopup = () => {
 
 //创建卡片
 const submit = async () => {
-    //发送请求
-    const result = await proxy.$api.insertWall(data)
-    //重新获取墙列表
-    emit('initCardList',-1)
-    //关闭弹窗
-    colsePopup()
-    //提示用户
-    proxy.$message({ message: '创建成功', type: 'success' })
+    //如果是留言
+    if (wallId.value === '0' && data.message) {
+        //发送请求
+        const result = await proxy.$api.insertWall(data)
+        //重新获取墙列表
+        emit('initCardList', -1)
+        //关闭弹窗
+        colsePopup()
+        //提示用户
+        proxy.$message({ message: '创建成功', type: 'success' })
+    } else if (wallId.value === '1' && data.imgurl) {
+        //如果是照片 
+        //将图片转为二进制
+        const formData = new FormData()
+        formData.append('file', document.getElementById("file").files[0])
+        //上传图片
+        const uploadResult = await proxy.$api.profile(formData)
+        data.imgurl = uploadResult.data
+        //保存到数据库
+        const insertResult = await proxy.$api.insertWall(data)
+        //重新获取墙列表
+        emit('initCardList', -1)
+        //关闭弹窗
+        colsePopup()
+        //提示用户
+        proxy.$message({ message: '创建成功', type: 'success' })
+    }
 }
 
 </script>

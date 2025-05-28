@@ -3,7 +3,7 @@
         <div class="photo-preview">
             <div class="preview-background"></div>
             <div class="preview-img">
-                <img :src="`../../static/${props.photos[store.state.popup.selectedCard]}.jpg`" alt="">
+                <img :src="`http://localhost:3000/${photos[store.state.popup.selectedCard]}`" alt="">
             </div>
             <div @click="changePhoto(0)" class="preview-switch l-switch">
                 <svg class="icon" aria-hidden="true">

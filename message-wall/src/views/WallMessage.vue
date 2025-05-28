@@ -15,7 +15,7 @@
         </div>
         <!-- 照片墙列表 -->
         <div class="photo" v-show="wallId === '1'">
-            <photo-card class="photo-item" @click="changeCard(index)" v-for="(item, index) in photo.data" :photo="item"
+            <photo-card class="photo-item" @click="changeCard(index)" v-for="(item, index) in cardList" :photo="item"
                 :key="index" />
         </div>
         <!-- 卡片的状态 -->

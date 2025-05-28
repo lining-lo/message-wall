@@ -1,12 +1,12 @@
 <template>
     <div class="photo-card">
-        <img class="card-img" :src="`../../static/${photo.imgurl}.jpg`" alt="">
+        <img class="card-img" :src="`http://localhost:3000/${photo.imgurl}`" alt="">
         <div class="card-background"> </div>
         <div class="card-like">
             <svg class="icon" aria-hidden="true">
                 <use xlink:href="#icon-xiai"></use>
             </svg>
-            <span class="count">{{photo.like}}</span>
+            <span class="count">{{photo.like[0].count}}</span>
         </div>
     </div>
 </template>

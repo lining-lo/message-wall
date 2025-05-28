@@ -24,5 +24,10 @@ export default {
     //倒叙分页查询墙的评论
     findCommentPage(params) {
         return http.get('/findCommentPage', { params })
+    },
+
+    //文件上传
+    profile(data) {
+        return http.post('/profile', data)
     }
 }
