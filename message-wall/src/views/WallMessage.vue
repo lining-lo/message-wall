@@ -1,5 +1,8 @@
 <template>
     <div class="wall-message">
+        <!-- 头部导航 -->
+        <top-bar @initWall="initWall" />
+        <!-- 标题信息 -->
         <p class="title">{{ wallType[wallId].name }}</p>
         <p class="slogan">{{ wallType[wallId].slogan }}</p>
         <!-- 标签选项 -->
@@ -15,7 +18,7 @@
         </div>
         <!-- 照片墙列表 -->
         <div class="photo" v-show="wallId === '1'">
-            <photo-card class="photo-item" @click="changeCard(index)" v-for="(item, index) in cardList" :photo="item"
+            <photo-card class="photo-item" @toDetail="changeCard(index)" v-for="(item, index) in cardList" :photo="item"
                 :key="index" />
         </div>
         <!-- 卡片的状态 -->
@@ -37,7 +40,8 @@
         <popup :title="store.state.popup.title">
             <create-card v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList"
                 @initCardList="selectNote" />
-            <detail :card="cardList[store.state.popup.selectedCard]" :comments="comments" @updateList="updateList" v-else />
+            <detail :card="cardList[store.state.popup.selectedCard]" :comments="comments" @updateList="updateList"
+                v-else />
         </popup>
         <!-- 大图预览 -->
         <photo-preview :photos="photoList" v-show="store.state.popup.isView" />
@@ -50,6 +54,7 @@ import loadingFile from '../assets/images/loading.json';
 import { getAssetURL } from '../utils/customize'
 import { note, photo } from '../../mock/index'
 import { wallType, label, noneTip } from '../utils/data'
+import TopBar from '../components/TopBar.vue';
 import Detail from '../components/Detail.vue'
 import CreateCard from '../components/CreateCard.vue'
 import Popup from '../components/Popup.vue'
@@ -79,7 +84,7 @@ const selectedLable = computed(() => store.state.popup.selectedLable)
 const btnBottom = ref(10)
 
 //墙的类型(0留言,1照片)
-const wallId = computed(() => route.query.id || '0')
+const wallId = computed(() => store.state.popup.wallType)
 
 //照片墙的所有照片
 const photoList = ref([])
@@ -116,7 +121,9 @@ onMounted(() => {
 //选择词条
 const selectNote = (index) => {
     store.commit('updateSelectedLable', index)
+    //初始化墙数据
     cardList.value = []
+    photoList.value = []
     page.value = 1
     getCardList()
     //关闭弹窗
@@ -124,6 +131,8 @@ const selectNote = (index) => {
     store.commit('updateShow', false)
     store.commit('updateSelectedCard', -1)
     store.commit('updateView', false)
+    console.log(photoList.value);
+
 }
 
 //控制滚动条滚到到底部时添加按钮的位置
@@ -143,8 +152,14 @@ const scrollBottom = () => {
     }
 
     //加载更多
-    if (scrollTop + clientHeight + 10 >= scrollHeight) {
-        getCardList()
+    if (scrollTop + clientHeight + 1 >= scrollHeight) {
+        //设置0.8s加载状态
+        if (isLoading.value !== 2) {
+            isLoading.value = 1
+        }
+        setTimeout(() => {
+            getCardList()
+        }, 800);
     }
 }
 
@@ -219,13 +234,13 @@ const getCardList = async () => {
         const { data } = await proxy.$api.findWallPage(params)
         //获取墙列表
         cardList.value = cardList.value.concat(data.message)
-        console.log('cardList', cardList.value);
+        // console.log('cardList', cardList.value);
         //单独获取照片路径数组
         if (params.type === 1) {
             for (let i = 0; i < data.message.length; i++) {
                 photoList.value.push(data.message[i].imgurl)
             }
-            console.log('photoList', photoList.value);
+            // console.log('photoList', photoList.value);
         }
         //设置下一页
         if (data.message.length) {
@@ -268,11 +283,28 @@ const getComments = async () => {
 }
 
 //发送评论时更新列表
-const updateList = ()=>{
+const updateList = () => {
     //重新获取留言列表
     getComments()
     //重新获取卡片列表
     cardList.value = []
+    page.value = 1
+    getCardList()
+}
+
+//切换墙时|关闭弹窗初始化数据
+const initWall = () => {
+    //选择的标签初始化（全部）
+    store.commit('updateSelectedLable', -1)
+    //选择的卡片初始化（不选）
+    store.commit('updateSelectedCard', -1)
+    //关闭大图预览
+    store.commit('updateView', false)
+    //关闭查看详情
+    store.commit('updateShow', false)
+    //重新获取卡片列表
+    cardList.value = []
+    photoList.value = []
     page.value = 1
     getCardList()
 }

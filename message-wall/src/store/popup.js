@@ -8,7 +8,9 @@ const state = {
     //卡片的标题
     title: '写留言',
     //是否打开大图预览
-    isView: false
+    isView: false,
+    //墙选中状态(0留言，1照片)
+    wallType: '0'
 }
 
 const mutations = {
@@ -31,7 +33,11 @@ const mutations = {
     //打开与关闭大图预览
     updateView(state, payload) {
         state.isView = payload
-    }
+    },
+    //改变墙的类型
+    updateWallType(state, payload) {
+        state.wallType = payload
+    },
 }
 
 export default {

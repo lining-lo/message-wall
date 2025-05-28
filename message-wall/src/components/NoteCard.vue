@@ -8,8 +8,7 @@
         <div class="bottom">
             <div class="feedback">
                 <div class="like">
-                    <svg class="icon" @click="addLike" :class="{ addlike: isLike !== 0 }"
-                        aria-hidden="true">
+                    <svg class="icon" @click="addLike" :class="{ addlike: props.note.isLike[0].count !== 0 }" aria-hidden="true">
                         <use xlink:href="#icon-xiai"></use>
                     </svg>
                     <span class="value">{{ note.like[0].count }}</span>
@@ -50,22 +49,21 @@ const toDetail = () => {
 
 //点赞
 const addLike = async () => {
-    //点过一次赞不允许再点赞
-    if (!isLike.value) {
-        isLike.value++
+        //点过一次赞不允许再点赞
+        if (props.note.isLike[0].count === 0) {
         //获取参数
         const data = {
             wallId: props.note.id,
             userId: localStorage.getItem('user'),
-            type: props.note.type,
+            type: 0,
             moment: new Date()
         }
         //插入一条点赞数据
         const result = await proxy.$api.insertFeedBack(data)
         //界面反馈
         props.note.like[0].count++
+        props.note.isLike[0].count++
     }
-
 }
 
 </script>

@@ -1,19 +1,51 @@
 <template>
     <div class="photo-card">
         <img class="card-img" :src="`http://localhost:3000/${photo.imgurl}`" alt="">
-        <div class="card-background"> </div>
+        <div class="card-background" @click="toDetail"> </div>
         <div class="card-like">
-            <svg class="icon" aria-hidden="true">
+            <svg class="icon" :class="{ addlike: props.photo.isLike[0].count !== 0 }" @click="addLike" aria-hidden="true">
                 <use xlink:href="#icon-xiai"></use>
             </svg>
-            <span class="count">{{photo.like[0].count}}</span>
+            <span class="count">{{ photo.like[0].count }}</span>
         </div>
     </div>
 </template>
 
 <script setup>
+import { ref, reactive, getCurrentInstance } from 'vue'
+
+//获取当前vue实例
+const { proxy } = getCurrentInstance()
+
 //获取父组件参数
 const props = defineProps(['photo'])
+
+//获取父组件传递的方法
+const emit = defineEmits(['toDetail'])
+
+//点击卡片显示详情
+const toDetail = () => {
+    emit('toDetail')
+}
+
+//点赞
+const addLike = async () => {
+    //点过一次赞不允许再点赞
+    if (props.photo.isLike[0].count === 0) {
+        //获取参数
+        const data = {
+            wallId: props.photo.id,
+            userId: localStorage.getItem('user'),
+            type: 0,
+            moment: new Date()
+        }
+        //插入一条点赞数据
+        const result = await proxy.$api.insertFeedBack(data)
+        //界面反馈
+        props.photo.like[0].count++
+        props.photo.isLike[0].count++
+    }
+}
 
 </script>
 <style lang='less' scoped>
@@ -54,6 +86,10 @@ const props = defineProps(['photo'])
         .icon {
             color: @gray-3;
             padding-right: @padding-4;
+
+            &.addlike {
+                color: @like;
+            }
         }
 
         .count {
