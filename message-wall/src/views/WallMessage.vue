@@ -1,50 +1,57 @@
 <template>
-    <div class="wall-message">
-        <!-- 头部导航 -->
-        <top-bar @initWall="initWall" />
-        <!-- 标题信息 -->
-        <p class="title">{{ wallType[wallId].name }}</p>
-        <p class="slogan">{{ wallType[wallId].slogan }}</p>
-        <!-- 标签选项 -->
-        <div class="label">
-            <p @click="selectNote(-1)" :class="{ selected: -1 === selectedLable }">全部</p>
-            <p @click="selectNote(index)" :class="{ selected: index === selectedLable }"
-                v-for="(item, index) in label[wallId]">{{ item }}</p>
+    <div class="wall-message" ref="wallMessage" :class="{ dark: isDark }">
+        <div class="wall-background" :class="[{ wallBackground: isDark }, { cleardark: isDark }]">
+            <!-- 头部导航 -->
+            <top-bar @initWall="initWall" :class="{ cleardark: isDark }" :isDark="isDark"
+                @changeSwitch="changeSwitch" />
+            <!-- 标题信息 -->
+            <div class="wall-title" :class="{ cleardark: isDark }">
+                <p class="title">{{ wallType[wallId].name }}</p>
+                <p class="slogan">{{ wallType[wallId].slogan }}</p>
+            </div>
+            <!-- 标签选项 -->
+            <div class="label" :class="{ cleardark: isDark }">
+                <p @click="selectNote(-1)" :class="{ selected: -1 === selectedLable }">全部</p>
+                <p @click="selectNote(index)" :class="{ selected: index === selectedLable }"
+                    v-for="(item, index) in label[wallId]">{{ item }}</p>
+            </div>
+            <!-- 留言墙墙列表 -->
+            <div class="card" v-show="wallId === '0'" :class="{ cleardark: isDark }">
+                <note-card :class="{ cardselected: index === store.state.popup.selectedCard }"
+                    @toDetail="changeCard(index)" class="card-item" :note="item" v-for="(item, index) in cardList"
+                    :key="index" />
+            </div>
+            <!-- 照片墙列表 -->
+            <div class="photo" v-show="wallId === '1'">
+                <photo-card class="photo-item" @toDetail="changeCard(index)" v-for="(item, index) in cardList"
+                    :photo="item" :key="index" />
+            </div>
+            <!-- 卡片的状态 -->
+            <div class="none" v-show="isLoading === 0">
+                <img class="none-img" :src="getAssetURL(noneTip[parseInt(wallId)].url)" alt="">
+                <p class="none-msg">{{ noneTip[parseInt(wallId)].msg }}</p>
+            </div>
+            <div class="loading" v-show="isLoading === 1">
+                <div class="lottie"></div>
+            </div>
+            <p class="finish" v-show="isLoading === 2">没有更多...</p>
+            <!-- 创建按钮 -->
+            <div :class="{ cleardark: isDark }" v-show="!store.state.popup.isShow" @click="openPopup" class="add"
+                :style="{ bottom: btnBottom + 'px' }">
+                <svg class="icon" aria-hidden="true">
+                    <use xlink:href="#icon-tianjia-"></use>
+                </svg>
+            </div>
+            <!-- 弹窗 -->
+            <popup :title="store.state.popup.title" :class="{ cleardark: isDark }">
+                <create-card v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList"
+                    @initCardList="selectNote" />
+                <detail :card="cardList[store.state.popup.selectedCard]" :comments="comments" @updateList="updateList"
+                    v-else />
+            </popup>
+            <!-- 大图预览 -->
+            <photo-preview :isDark="isDark" :photos="photoList" v-show="store.state.popup.isView" />
         </div>
-        <!-- 留言墙墙列表 -->
-        <div class="card" v-show="wallId === '0'">
-            <note-card :class="{ cardselected: index === store.state.popup.selectedCard }" @toDetail="changeCard(index)"
-                class="card-item" :note="item" v-for="(item, index) in cardList" :key="index" />
-        </div>
-        <!-- 照片墙列表 -->
-        <div class="photo" v-show="wallId === '1'">
-            <photo-card class="photo-item" @toDetail="changeCard(index)" v-for="(item, index) in cardList" :photo="item"
-                :key="index" />
-        </div>
-        <!-- 卡片的状态 -->
-        <div class="none" v-show="isLoading === 0">
-            <img class="none-img" :src="getAssetURL(noneTip[parseInt(wallId)].url)" alt="">
-            <p class="none-msg">{{ noneTip[parseInt(wallId)].msg }}</p>
-        </div>
-        <div class="loading" v-show="isLoading === 1">
-            <div class="lottie"></div>
-        </div>
-        <p class="finish" v-show="isLoading === 2">没有更多...</p>
-        <!-- 创建按钮 -->
-        <div v-show="!store.state.popup.isShow" @click="openPopup" class="add" :style="{ bottom: btnBottom + 'px' }">
-            <svg class="icon" aria-hidden="true">
-                <use xlink:href="#icon-tianjia-"></use>
-            </svg>
-        </div>
-        <!-- 弹窗 -->
-        <popup :title="store.state.popup.title">
-            <create-card v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList"
-                @initCardList="selectNote" />
-            <detail :card="cardList[store.state.popup.selectedCard]" :comments="comments" @updateList="updateList"
-                v-else />
-        </popup>
-        <!-- 大图预览 -->
-        <photo-preview :photos="photoList" v-show="store.state.popup.isView" />
     </div>
 </template>
 
@@ -103,6 +110,11 @@ const pagesize = ref(8)
 
 //所有评论
 const comments = ref([])
+
+//暗黑模式开关(true暗色，false亮色)
+const isDark = ref(false)
+
+const wallMessage = ref()
 
 //挂载
 onMounted(() => {
@@ -310,127 +322,165 @@ const initWall = () => {
     getCardList()
 }
 
+//切换暗黑模式
+const changeSwitch = () => {
+    // 设置切换状态
+    isDark.value = !isDark.value
+}
+
 </script>
 <style lang='less' scoped>
+.dark {
+    // 样式反转
+    filter: invert(1) hue-rotate(180deg);
+}
+
+.cleardark {
+    // 取消样式反转
+    filter: invert(1) hue-rotate(180deg);
+}
+
+.wallBackground {
+    background-image: url(../../static/bg.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    filter: invert(1) hue-rotate(180deg);
+}
+
 .wall-message {
-    min-height: 600px;
+    .wall-background {
+        min-height: 600px;
+        position: relative;
+        // .wall-background {
+        //     width: 100%;
+        //     height: 100%;
+        //     position: fixed;
+        //     top: 0;
+        //     left: 0;
+        //     z-index: -1;
+        // }
 
-    .title {
-        padding-top: 48px;
-        padding-bottom: @padding-8;
-        font-size: 56px;
-        color: @gray-1;
-        text-align: center;
-        font-weight: 600;
-    }
+        .wall-title {
+            padding-top: 48px;
+            padding-bottom: @padding-8;
 
-    .slogan {
-        color: @gray-2;
-        text-align: center;
-    }
+            .title {
+                font-size: 56px;
+                color: @gray-1;
+                text-align: center;
+                font-weight: 600;
+            }
 
-    .label {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-top: 40px;
-
-        p {
-            padding: 0 14px;
-            margin: @padding-4;
-            color: @gray-2;
-            box-sizing: border-box;
-            cursor: pointer;
+            .slogan {
+                color: @gray-2;
+                text-align: center;
+            }
         }
 
-        .selected {
-            color: @gray-1;
-            font-weight: 600;
-            border: 1px solid @gray-1;
-            border-radius: 16px;
+        .label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 40px;
+
+            p {
+                padding: 0 14px;
+                margin: @padding-4;
+                color: @gray-2;
+                box-sizing: border-box;
+                cursor: pointer;
+            }
+
+            .selected {
+                color: @gray-1;
+                font-weight: 600;
+                border: 1px solid @gray-1;
+                border-radius: 16px;
+            }
         }
-    }
 
-    .card {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        margin-top: 20px;
-        transition: @tr;
+        .card {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            transition: @tr;
 
-        .card-item {
-            margin: 6px;
+            .card-item {
+                margin: 6px;
+            }
+
+            .cardselected {
+                border: 1px solid @primary-color;
+            }
         }
 
-        .cardselected {
-            border: 1px solid @primary-color;
-        }
-    }
-
-    .photo {
-        width: 88%;
-        margin: 20px auto;
-        columns: 5;
-        column-gap: @padding-4;
-
-        .photo-item {
-            margin-bottom: @padding-4;
-            break-inside: avoid;
-        }
-    }
-
-    .none {
-        width: 100%;
-        text-align: center;
-        padding-top: 70px;
-        position: absolute;
-        top: 280;
-
-        .none-img {
+        .photo {
+            width: 88%;
             margin: 0 auto;
-            width: 100px;
+            margin-top: 20px;
+            columns: 5;
+            column-gap: @padding-4;
+
+            .photo-item {
+                margin-bottom: @padding-4;
+                break-inside: avoid;
+            }
         }
 
-        .none-msg {
-            font-family: serif;
-            font-weight: 700;
-            font-size: 18px;
+        .none {
+            width: 100%;
+            text-align: center;
+            padding-top: 70px;
+            position: absolute;
+            top: 280;
+
+            .none-img {
+                margin: 0 auto;
+                width: 100px;
+            }
+
+            .none-msg {
+                font-family: serif;
+                font-weight: 700;
+                font-size: 18px;
+                color: @gray-3;
+            }
+        }
+
+        .loading {
+            width: 100%;
+
+            .lottie {
+                height: 150px;
+                margin: 0 auto;
+            }
+        }
+
+        .finish {
+            text-align: center;
             color: @gray-3;
+            padding: 20px;
         }
-    }
 
-    .loading {
-        width: 100%;
+        .add {
+            width: 56px;
+            height: 56px;
+            background: @gray-1;
+            box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.08);
+            border-radius: 28px;
+            position: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: @tr;
+            right: 12px;
+            cursor: pointer;
 
-        .lottie {
-            height: 150px;
-            margin: 20px auto;
-        }
-    }
-
-    .finish {
-        text-align: center;
-        color: @gray-3;
-        padding: 20px;
-    }
-
-    .add {
-        width: 56px;
-        height: 56px;
-        background: @gray-1;
-        box-shadow: 0px 4px 8px 0px rgba(0, 0, 0, 0.08);
-        border-radius: 28px;
-        position: fixed;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: @tr;
-        right: 12px;
-        cursor: pointer;
-
-        .icon {
-            color: @gray-10;
-            font-size: 24px;
+            .icon {
+                color: @gray-10;
+                font-size: 24px;
+            }
         }
     }
 }

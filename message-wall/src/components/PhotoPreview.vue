@@ -1,7 +1,7 @@
 <template>
     <transition name="transition-view">
         <div class="photo-preview">
-            <div class="preview-background"></div>
+            <div class="preview-background" :class="{ dark: isDark }"></div>
             <div class="preview-img">
                 <img :src="`http://localhost:3000/${photos[store.state.popup.selectedCard]}`" alt="">
             </div>
@@ -20,13 +20,17 @@
 </template>
 
 <script setup>
+import { ref, reactive, computed } from 'vue'
 import { useStore } from 'vuex';
 
 //获取父组件传递的参数
-const props = defineProps(['photos'])
+const props = defineProps(['photos', 'isDark'])
 
 //获取sotre实例
 const store = useStore()
+
+//暗黑模式开关(true暗色，false亮色)
+const isDark = computed(() => props.isDark)
 
 //点击切换图片(0上一张，1下一张)
 const changePhoto = (choice) => {
@@ -96,6 +100,10 @@ const changePhoto = (choice) => {
         height: 100%;
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(20px);
+
+        &.dark {
+            background: rgba(28, 37, 49, 0.8);
+        }
     }
 
     .preview-img {
