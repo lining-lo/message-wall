@@ -10,7 +10,9 @@ const state = {
     //是否打开大图预览
     isView: false,
     //墙选中状态(0留言，1照片)
-    wallType: '0'
+    wallType: '0',
+    //登录弹窗的开关
+    isLogin: false
 }
 
 const mutations = {
@@ -38,6 +40,10 @@ const mutations = {
     updateWallType(state, payload) {
         state.wallType = payload
     },
+    //改变登录弹窗开启与关闭
+    updateisLogin(state, payload) {
+        state.isLogin = payload
+    }
 }
 
 export default {

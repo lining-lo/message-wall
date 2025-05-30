@@ -34,6 +34,16 @@ exports.insertComment = async (request, response) => {
     })
 }
 
+//新建用户
+exports.insertUser = async (request, response) => {
+    const data = request.body
+    await db.insertUser([data.username, data.password, data.moment]).then(result => {
+        response.send({
+            code: 200,
+            message: result
+        })
+    })
+}
 
 //删除墙，主表对映多条子表一起删除
 exports.deleteWall = async (request, response) => {
@@ -112,7 +122,19 @@ exports.findCommentPage = async (request, response) => {
 
     await db.findCommentPage(wallId, page, pagesize).then(result => {
         response.send({
-            conde: 200,
+            code: 200,
+            message: result
+        })
+    })
+}
+
+//根据用户名查找用户
+exports.findUserByUserName = async (request, response) => {
+    const data = request.body
+
+    await db.findUserByUserName(data.username).then(result => {
+        response.send({
+            code: 200,
             message: result
         })
     })

@@ -29,5 +29,15 @@ export default {
     //文件上传
     profile(data) {
         return http.post('/profile', data)
+    },
+
+    //注册用户
+    insertUser(data) {
+        return http.post('/insertUser', data)
+    },
+
+    //根据用户名查找用户
+    findUserByUserName(data){
+        return http.post('/findUserByUserName', data)
     }
 }

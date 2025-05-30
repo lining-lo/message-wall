@@ -96,6 +96,19 @@ const commentsSql =
      PRIMARY KEY ( id )
     );`
 
+//创建用户数据表sql
+const userSql =
+    `create table if not exists user( 
+     id INT NOT NULL AUTO_INCREMENT,
+     username VARCHAR(100) NOT NULL COMMENT '用户名',
+     password VARCHAR(100) NOT NULL COMMENT '密码',
+     imgurl VARCHAR(100) COMMENT '头像路径',
+     permission INT DEFAULT 1 COMMENT '权限(0管理员,1普通用户)',
+     moment VARCHAR(100) NOT NULL COMMENT '创建时间',
+     email VARCHAR(100) COMMENT '邮箱',
+     PRIMARY KEY ( id )
+);`
+
 //创建数据表的方法
 const createTable = (sql) => {
     return query(sql, [])
@@ -107,6 +120,7 @@ const create = async () => {
     createTable(wallsSql)
     createTable(feedbacksSql)
     createTable(commentsSql)
+    createTable(userSql)
 }
 
 create()
@@ -126,6 +140,12 @@ exports.insertFeedBack = (values) => {
 //新建评论
 exports.insertComment = (values) => {
     const sql = 'insert into comments set wallId=?,userId=?,imgurl=?,comment=?,name=?,moment=?;'
+    return query(sql, values)
+}
+
+//新建用户
+exports.insertUser = (values) => {
+    const sql = 'insert into user set username=?,password=?,moment=?;'
     return query(sql, values)
 }
 
@@ -185,4 +205,10 @@ exports.commentCount = (wallId) => {
 exports.isLike = (wallId, userId) => {
     const sql = `SELECT count(*) as count FROM feedbacks WHERE wallId = ? AND userId = ? AND type = 0;`
     return query(sql, [wallId, userId])
+}
+
+//根据用户名查找用户
+exports.findUserByUserName = (username) => {
+    const sql = `SELECT * FROM user WHERE username = ?;`
+    return query(sql, username)
 }

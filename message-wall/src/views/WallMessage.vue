@@ -2,8 +2,8 @@
     <div class="wall-message" ref="wallMessage" :class="{ dark: isDark }">
         <div class="wall-background" :class="[{ wallBackground: isDark }, { cleardark: isDark }]">
             <!-- 头部导航 -->
-            <top-bar @initWall="initWall" :class="{ cleardark: isDark }" :isDark="isDark"
-                @changeSwitch="changeSwitch" />
+            <top-bar @initWall="initWall" :class="{ cleardark: isDark }" :isDark="isDark" @changeSwitch="changeSwitch"
+                @toLogin="toLogin" />
             <!-- 标题信息 -->
             <div class="wall-title" :class="{ cleardark: isDark }">
                 <p class="title">{{ wallType[wallId].name }}</p>
@@ -51,6 +51,8 @@
             </popup>
             <!-- 大图预览 -->
             <photo-preview :isDark="isDark" :photos="photoList" v-show="store.state.popup.isView" />
+            <!-- 用户登录 -->
+            <login v-show="isLogin" class="message-login" @toLogin="toLogin" :class="{ cleardark: isDark }" />
         </div>
     </div>
 </template>
@@ -68,6 +70,7 @@ import Popup from '../components/Popup.vue'
 import NoteCard from '../components/NoteCard.vue'
 import PhotoCard from '../components/PhotoCard.vue'
 import PhotoPreview from '../components/PhotoPreview.vue'
+import Login from '../components/Login.vue';
 import { useStore } from 'vuex'
 import { ref, reactive, onMounted, computed, nextTick, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -114,7 +117,8 @@ const comments = ref([])
 //暗黑模式开关(true暗色，false亮色)
 const isDark = ref(false)
 
-const wallMessage = ref()
+//用户登录弹窗开关
+const isLogin = computed(() => store.state.popup.isLogin)
 
 //挂载
 onMounted(() => {
@@ -328,6 +332,12 @@ const changeSwitch = () => {
     isDark.value = !isDark.value
 }
 
+//打开用户登录弹窗
+const toLogin = (key) => {
+    //打开弹窗
+    store.commit('updateisLogin', key)
+}
+
 </script>
 <style lang='less' scoped>
 .dark {
@@ -481,6 +491,13 @@ const changeSwitch = () => {
                 color: @gray-10;
                 font-size: 24px;
             }
+        }
+
+        .message-login {
+            position: fixed;
+            z-index: 1111;
+            top: 64px;
+            right: 12px;
         }
     }
 }

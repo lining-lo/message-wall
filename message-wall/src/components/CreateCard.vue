@@ -155,7 +155,7 @@ const submit = async () => {
 }
 
 </script>
-<style lang='less'>
+<style lang='less' scoped>
 .create-card {
     padding: 0 @padding-20 120px;
     position: relative;

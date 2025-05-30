@@ -32,7 +32,7 @@ const colsePopup = () => {
     store.commit('updateView', false)
 }
 </script>
-<style lang='less'>
+<style lang='less' scoped>
 .modal {
     //入场
     &-enter {

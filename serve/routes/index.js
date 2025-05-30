@@ -17,6 +17,11 @@ module.exports = function (app) {
         controller.insertComment(request, response)
     })
 
+    //新建用户
+    app.post('/insertUser', (request, response) => {
+        controller.insertUser(request, response)
+    })
+
     //删除墙，主表对映多条子表一起删除
     app.post('/deleteWall', (request, response) => {
         controller.deleteWall(request, response)
@@ -42,4 +47,8 @@ module.exports = function (app) {
         controller.findCommentPage(request, response)
     })
 
+    //根据用户名查找用户
+    app.post('/findUserByUserName', (request, response) => {
+        controller.findUserByUserName(request, response)
+    })
 }

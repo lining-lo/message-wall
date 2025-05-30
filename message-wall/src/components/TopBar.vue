@@ -15,11 +15,12 @@
         <!-- 暗黑模式切换和用户 -->
         <div class="right">
             <!-- 暗黑模式开关 -->
-            <div class="right-change" :class="{ cleardark: isDark }" :style="{ backgroundColor: isDark ? '#ffcc58' : 'gray' }">
+            <div class="right-change" :class="{ cleardark: isDark }"
+                :style="{ backgroundColor: isDark ? '#ffcc58' : 'gray' }">
                 <div class="switch" :style="{ float: isDark ? 'right' : 'left' }" @click="changeSwitch"></div>
             </div>
             <!-- 用户头像 -->
-            <div class="right-user"></div>
+            <div class="right-user" @click="toLogin(1)"></div>
         </div>
     </div>
 </template>
@@ -34,7 +35,7 @@ import { useStore } from 'vuex';
 const props = defineProps(['isDark'])
 
 //获取父组件方法
-const emit = defineEmits(['initWall', 'changeSwitch'])
+const emit = defineEmits(['initWall', 'changeSwitch','toLogin'])
 
 //获取store实例
 const store = useStore()
@@ -66,6 +67,11 @@ const changeWall = (id) => {
 //切换暗黑模式
 const changeSwitch = () => {
     emit('changeSwitch')
+}
+
+//打开用户登录弹窗
+const toLogin = () => {
+    emit('toLogin', true)
 }
 
 </script>
@@ -150,6 +156,7 @@ const changeSwitch = () => {
             border-radius: 50%;
             background-color: #9d6f6f;
             float: right;
+            cursor: pointer;
         }
     }
 }
