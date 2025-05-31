@@ -37,7 +37,17 @@ export default {
     },
 
     //根据用户名查找用户
-    findUserByUserName(data){
+    findUserByUserName(data) {
         return http.post('/findUserByUserName', data)
-    }
+    },
+
+    //根据用户名和密码查找用户（用户登录）
+    findUserByUserNameAndPassword(data) {
+        return http.post('/findUserByUserNameAndPassword', data)
+    },
+
+    //更新用户信息
+    updateUser(data) {
+        return http.post('/updateUser', data)
+    },
 }

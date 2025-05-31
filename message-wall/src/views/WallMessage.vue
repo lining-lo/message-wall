@@ -279,8 +279,14 @@ const getCardList = async () => {
 
 //获取用户
 const getUser = () => {
-    if (!localStorage.getItem('user')) {
-        localStorage.setItem('user', '游客' + Math.floor(Math.random() * 100000000))
+    //没有token
+    if (!store.state.popup.token) {
+        //生成游客信息并存入浏览器
+        const userInfo = {
+            username: '游客' + Math.floor(Math.random() * 100000000),
+            imgurl: Math.floor(Math.random() * 14),
+        }
+        store.commit('updateUserInfo', JSON.stringify(userInfo)) 
     }
 }
 
@@ -418,6 +424,13 @@ const toLogin = (key) => {
 
             .card-item {
                 margin: 6px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+                &:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+                }
             }
 
             .cardselected {

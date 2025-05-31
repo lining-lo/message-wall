@@ -20,12 +20,18 @@
                 <div class="switch" :style="{ float: isDark ? 'right' : 'left' }" @click="changeSwitch"></div>
             </div>
             <!-- 用户头像 -->
-            <div class="right-user" @click="toLogin(1)"></div>
+            <div class="right-user">
+                <img v-if="token" :src="`http://localhost:3000/${JSON.parse(userInfo).imgurl}`" @click="toLogin" alt="">
+                <div class="bg" @click="toLogin" :style="{ background: portrait[JSON.parse(userInfo).imgurl] }" v-else>
+                </div>
+                <p class="logout" v-if="token" @click="logout">退出</p>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
+import { portrait } from '../utils/data';
 import { useRoute, useRouter } from 'vue-router';
 import YkButton from './YkButton.vue';
 import { ref, reactive, computed } from 'vue'
@@ -35,7 +41,7 @@ import { useStore } from 'vuex';
 const props = defineProps(['isDark'])
 
 //获取父组件方法
-const emit = defineEmits(['initWall', 'changeSwitch','toLogin'])
+const emit = defineEmits(['initWall', 'changeSwitch', 'toLogin'])
 
 //获取store实例
 const store = useStore()
@@ -51,6 +57,12 @@ const wallId = computed(() => store.state.popup.wallType)
 
 //暗黑模式开关(true暗色，false亮色)
 const isDark = computed(() => props.isDark)
+
+//用户是否登录
+const token = computed(() => store.state.popup.token)
+
+//用户信息
+const userInfo = computed(() => store.state.popup.userInfo)
 
 //切换留言墙和照片墙
 const changeWall = (id) => {
@@ -72,6 +84,14 @@ const changeSwitch = () => {
 //打开用户登录弹窗
 const toLogin = () => {
     emit('toLogin', true)
+}
+
+//退出登录
+const logout = () => {
+    //清除token
+    store.commit('clearToken')
+    //清除用户信息
+    store.commit('clearUserInfo')
 }
 
 </script>
@@ -151,12 +171,44 @@ const toLogin = () => {
         }
 
         .right-user {
+            position: relative;
             width: 40px;
             height: 40px;
             border-radius: 50%;
             background-color: #9d6f6f;
             float: right;
             cursor: pointer;
+            transition: @tr;
+
+            &:hover .logout {
+                opacity: 1;
+            }
+
+            .bg {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+            }
+
+            .logout {
+                position: absolute;
+                top: 46px;
+                left: -4px;
+                width: 28px;
+                background: rgba(255, 255, 255, .8);
+                text-align: center;
+                padding: 8px 12px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px #0000001a;
+                cursor: pointer;
+                opacity: 0;
+            }
         }
     }
 }

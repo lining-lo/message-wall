@@ -139,3 +139,27 @@ exports.findUserByUserName = async (request, response) => {
         })
     })
 }
+
+//根据用户名和密码查找用户（用户登录）
+exports.findUserByUserNameAndPassword = async (request, response) => {
+    const data = request.body
+
+    await db.findUserByUserNameAndPassword(data.username, data.password).then(result => {
+        response.send({
+            code: 200,
+            message: result
+        })
+    })
+}
+
+//更新用户信息
+exports.updateUser = async (request, response) => {
+    const data = request.body
+
+    await db.updateUser(data.username, data.password, data.email, data.imgurl, data.id).then(result => {
+        response.send({
+            code: 200,
+            message: result
+        })
+    })
+}

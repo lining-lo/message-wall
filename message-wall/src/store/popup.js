@@ -12,7 +12,14 @@ const state = {
     //墙选中状态(0留言，1照片)
     wallType: '0',
     //登录弹窗的开关
-    isLogin: false
+    isLogin: false,
+    //token
+    token: localStorage.getItem('token') || null,
+    //用户信息
+    userInfo: localStorage.getItem('userInfo') || JSON.stringify({
+        username: '游客' + Math.floor(Math.random() * 100000000),
+        imgurl: Math.floor(Math.random() * 14),
+    })
 }
 
 const mutations = {
@@ -43,6 +50,29 @@ const mutations = {
     //改变登录弹窗开启与关闭
     updateisLogin(state, payload) {
         state.isLogin = payload
+    },
+    //修改token
+    updateToken(state, payload) {
+        state.token = payload
+        localStorage.setItem('token', payload)
+    },
+    //清除token
+    clearToken(state, payload) {
+        state.token = null
+        localStorage.removeItem('token')
+    },
+    //修改用户信息
+    updateUserInfo(state, payload) {
+        state.userInfo = payload
+        localStorage.setItem('userInfo', payload)
+    },
+    //清除用户信息
+    clearUserInfo(state, payload) {
+        state.userInfo = JSON.stringify({
+            username: '游客' + Math.floor(Math.random() * 100000000),
+            imgurl: Math.floor(Math.random() * 14),
+        })
+        localStorage.removeItem('userInfo')
     }
 }
 

@@ -212,3 +212,21 @@ exports.findUserByUserName = (username) => {
     const sql = `SELECT * FROM user WHERE username = ?;`
     return query(sql, username)
 }
+
+//根据用户名和密码查找用户（用户登录）
+exports.findUserByUserNameAndPassword = (username, password) => {
+    const sql = `SELECT * FROM user WHERE username=? AND password =?;`
+    return query(sql, [username, password])
+}
+
+//修改用户信息
+exports.findUserByUserNameAndPassword = (username, password) => {
+    const sql = `SELECT * FROM user WHERE username=? AND password =?;`
+    return query(sql, [username, password])
+}
+
+//更新用户信息
+exports.updateUser = (username,password,email,imgurl,id)=>{
+    const sql = `UPDATE user SET username = ?,password = ?,email = ?,imgurl = ? WHERE id = ?;`
+    return query(sql, [username,password,email,imgurl,id])
+}

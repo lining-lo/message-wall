@@ -51,4 +51,14 @@ module.exports = function (app) {
     app.post('/findUserByUserName', (request, response) => {
         controller.findUserByUserName(request, response)
     })
+
+    //根据用户名和密码查找用户（用户登录）
+    app.post('/findUserByUserNameAndPassword', (request, response) => {
+        controller.findUserByUserNameAndPassword(request, response)
+    })
+
+    //更新用户信息
+    app.post('/updateUser', (request, response) => {
+        controller.updateUser(request, response)
+    })
 }
