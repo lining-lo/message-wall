@@ -8,7 +8,8 @@
         <div class="bottom">
             <div class="feedback">
                 <div class="like">
-                    <svg class="icon" @click="addLike" :class="{ addlike: props.note.isLike[0].count !== 0 }" aria-hidden="true">
+                    <svg class="icon" @click="addLike" :class="{ addlike: props.note.isLike[0].count !== 0 }"
+                        aria-hidden="true">
                         <use xlink:href="#icon-xiai"></use>
                     </svg>
                     <span class="value">{{ note.like[0].count }}</span>
@@ -28,7 +29,8 @@
 <script setup>
 import { label, cardColor } from '../utils/data';
 import { formattime } from '../utils/customize';
-import { ref, reactive, getCurrentInstance } from 'vue'
+import { ref, reactive, getCurrentInstance, computed } from 'vue'
+import { useStore } from 'vuex';
 
 //获取当前vue实例
 const { proxy } = getCurrentInstance()
@@ -39,8 +41,14 @@ const props = defineProps(['note'])
 //获取父组件传递的方法
 const emit = defineEmits(['toDetail'])
 
+//获取store实例
+const store = useStore()
+
 //是否点赞
 const isLike = ref(props.note.isLike[0].count)
+
+//用户信息
+const userInfo = computed(() => store.state.popup.userInfo)
 
 //点击卡片显示详情
 const toDetail = () => {
@@ -49,12 +57,12 @@ const toDetail = () => {
 
 //点赞
 const addLike = async () => {
-        //点过一次赞不允许再点赞
-        if (props.note.isLike[0].count === 0) {
+    //点过一次赞不允许再点赞
+    if (props.note.isLike[0].count === 0) {
         //获取参数
         const data = {
             wallId: props.note.id,
-            userId: localStorage.getItem('user'),
+            userId: JSON.parse(userInfo.value).username,
             type: 0,
             moment: new Date()
         }
@@ -65,7 +73,7 @@ const addLike = async () => {
         props.note.isLike[0].count++
     }
     console.log(props.note);
-    
+
 }
 
 </script>

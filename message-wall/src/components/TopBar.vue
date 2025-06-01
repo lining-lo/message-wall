@@ -21,7 +21,7 @@
             </div>
             <!-- 用户头像 -->
             <div class="right-user">
-                <img v-if="token" :src="`http://localhost:3000/${JSON.parse(userInfo).imgurl}`" @click="toLogin" alt="">
+                <img :class="{ cleardark: isDark }" v-if="token" :src="`http://localhost:3000/${JSON.parse(userInfo).imgurl}`" @click="toLogin" alt="">
                 <div class="bg" @click="toLogin" :style="{ background: portrait[JSON.parse(userInfo).imgurl] }" v-else>
                 </div>
                 <p class="logout" v-if="token" @click="logout">退出</p>
@@ -31,10 +31,11 @@
 </template>
 
 <script setup>
+import { ipTo10DigitNumber } from '../utils/customize';
 import { portrait } from '../utils/data';
 import { useRoute, useRouter } from 'vue-router';
 import YkButton from './YkButton.vue';
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, getCurrentInstance } from 'vue'
 import { useStore } from 'vuex';
 
 //获取父组件的参数
@@ -42,6 +43,9 @@ const props = defineProps(['isDark'])
 
 //获取父组件方法
 const emit = defineEmits(['initWall', 'changeSwitch', 'toLogin'])
+
+//获取当前vue实例
+const { proxy } = getCurrentInstance()
 
 //获取store实例
 const store = useStore()
@@ -87,11 +91,19 @@ const toLogin = () => {
 }
 
 //退出登录
-const logout = () => {
+const logout = async() => {
     //清除token
     store.commit('clearToken')
     //清除用户信息
-    store.commit('clearUserInfo')
+    //获取ip地址并加密
+    const { data } = await proxy.$api.getIp()
+    //生成游客信息并存入浏览器
+    const userInfo = {
+        username: '游客' + ipTo10DigitNumber(data.message),
+        imgurl: Math.floor(Math.random() * 14),
+    }
+   //刷新页面
+   location.reload()
 }
 
 </script>

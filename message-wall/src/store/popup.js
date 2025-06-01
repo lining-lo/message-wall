@@ -68,11 +68,8 @@ const mutations = {
     },
     //清除用户信息
     clearUserInfo(state, payload) {
-        state.userInfo = JSON.stringify({
-            username: '游客' + Math.floor(Math.random() * 100000000),
-            imgurl: Math.floor(Math.random() * 14),
-        })
         localStorage.removeItem('userInfo')
+        state.userInfo = JSON.stringify(payload)
     }
 }
 

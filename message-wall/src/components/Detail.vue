@@ -19,7 +19,9 @@
         <div class="detail-comment">
             <p class="comment-title">评论{{ props.card.comment }}</p>
             <div class="comment-item" v-for="(item, index) in comments">
-                <div class="avatar" :style="{ backgroundImage: portrait[item.imgurl] }"></div>
+                <div class="avatar" :style="{ background: portrait[item.imgurl] }" >
+                    <img v-if="/^\/photo\//.test(item.imgurl)" :class="{ cleardark: isDark }" :src="`http://localhost:3000/${item.imgurl}`" alt="">
+                </div>
                 <div class="content">
                     <div class="userInfo">
                         <p class="name">{{ item.name }}</p>
@@ -40,29 +42,42 @@ import YkButton from './YkButton.vue';
 import NoteCard from './NoteCard.vue';
 import { ref, reactive, computed, getCurrentInstance, onMounted } from 'vue'
 import { useRoute } from 'vue-router';
+import { useStore } from 'vuex';
 
 //获取当前vue实例
 const { proxy } = getCurrentInstance()
 
 //获取父组件参数
-const props = defineProps(['card','comments'])
+const props = defineProps(['card','comments','isDark'])
 
 //获取父组件方法
 const emit = defineEmits(['updateList'])
 
-//获取rooute实例
+//获取route实例
 const route = useRoute()
+
+//获取store实例
+const store = useStore()
 
 //墙的类型(0留言,1照片)
 const wallType = computed(() => route.query.id || '0')
 
+//暗黑模式开关(true暗色，false亮色)
+const isDark = computed(() => props.isDark)
+
+//用户是否登录
+const token = computed(() => store.state.popup.token)
+
+//用户信息
+const userInfo = computed(() => store.state.popup.userInfo)
+
 //发送评论的参数
 const data = reactive({
     wallId: props.card.id,
-    userId: localStorage.getItem('user'),
-    imgurl: props.card.imgurl,
+    userId: JSON.parse(userInfo.value).username,
+    imgurl: token ? JSON.parse(userInfo.value).imgurl : portrait[JSON.parse(userInfo.value).imgurl],
     comment: '',
-    name: localStorage.getItem('user'),
+    name: JSON.parse(userInfo.value).username,
     moment: new Date()
 })
 
@@ -166,9 +181,14 @@ const submit = async () => {
                 flex: none;
                 width: 28px;
                 height: 28px;
-                border-radius: 20px;
+                border-radius: 50%;
                 overflow: hidden;
                 background-color: skyblue;
+                img{
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                }
             }
 
             .content {

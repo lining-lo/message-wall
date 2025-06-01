@@ -50,4 +50,9 @@ export default {
     updateUser(data) {
         return http.post('/updateUser', data)
     },
+
+    //获取ip
+    getIp(){
+        return http.post('/getIp')
+    }
 }

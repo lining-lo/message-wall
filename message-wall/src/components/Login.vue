@@ -16,7 +16,8 @@
             <button class="login-submit" @click="submit">{{ formTitle[formType] }}</button>
             <p class="login-bottom">
                 <span class="forget">忘记密码?</span>
-                <span class="regist" @click="toRegist">{{ formType === 0 ? '注册' : '登录' }}</span>
+                <span class="regist" @click="changeFormType(1)" v-if="formType === 0">注册</span>
+                <span class="regist" @click="changeFormType(0)" v-if="formType === 1">登录</span>
             </p>
         </div>
         <!-- 个人信息 -->
@@ -34,7 +35,7 @@
                         <use xlink:href="#icon-tianjia-"></use>
                     </svg>
                 </div>
-                <img v-if="userData.imgurl" :src="userData.imgurl" alt="">
+                <img :class="{ cleardark: isDark }" v-if="userData.imgurl" :src="imgurl ? imgurl : `http://localhost:3000/${userData.imgurl}`" alt="">
             </div>
             <div class="info-form">
                 <p class="username">
@@ -59,7 +60,10 @@
 <script setup scoped>
 import { useStore } from 'vuex';
 import { getObjectURL } from '../utils/customize';
-import { ref, reactive, getCurrentInstance, computed } from 'vue'
+import { ref, reactive, getCurrentInstance, computed, onMounted } from 'vue'
+
+//获取父组件的参数
+const props = defineProps(['isDark'])
 
 //获取父组件方法
 const emit = defineEmits(['toLogin'])
@@ -70,10 +74,10 @@ const { proxy } = getCurrentInstance()
 //获取store实例
 const store = useStore()
 
-//表单标题(0登录,1注册,找回密码)
-const formTitle = ['登录', '注册', '找回密码']
+//表单标题(0登录,1注册)
+const formTitle = ['登录', '注册']
 
-//操作类型(0登录,1注册,2找回密码)
+//操作类型(0登录,1注册)
 const formType = ref(0)
 
 //登录|注册表单参数
@@ -111,24 +115,39 @@ const closeLogin = () => {
     formType.value = 0
 }
 
-//前往注册
-const toRegist = () => {
-    formType.value === 0 ? formType.value = 1 : formType.value = 0
+//上传的图片路径
+const imgurl = ref('')
+
+//暗黑模式开关(true暗色，false亮色)
+const isDark = computed(() => props.isDark)
+
+//挂载
+onMounted(() => {
+    //获取用户数据
+    getUserInfo()
+})
+
+//前往注册|登录
+const changeFormType = (type) => {
+    formType.value = type
+    //初始化数据
+    form.username = ''
+    form.password = ''
+    form.moment = new Date()
 }
 
 //上传图片
 const uploadFile = () => {
     let file = getObjectURL(document.getElementById("file").files[0]);
-    userData.imgurl = file
+    imgurl.value = file
 }
 
-//提交表单(0登录,1注册,2找回密码)
+//提交表单(0登录,1注册)
 const submit = async () => {
     //表单校验
-    for (const key in form) {
-        if (typeof form[key] === 'string' && form[key].trim() === '') {
-            return
-        }
+    if (form.username === '' || form.password === '') {
+        //提示用户并终止程序
+        return proxy.$message({ message: '请输入账号密码', type: 'error' })
     }
     //用户登录
     if (formType.value === 0) {
@@ -153,6 +172,8 @@ const submit = async () => {
         proxy.$message({ message: '登录成功', type: 'success' })
         //关闭弹窗并初始化数据
         closeLogin()
+        //刷新页面
+        location.reload()
     } else if (formType.value === 1) {
         //注册用户
         //查询是否已注册用户
@@ -160,6 +181,8 @@ const submit = async () => {
             if (result.data.message.length === 0) {
                 //发送注册用户请求
                 await proxy.$api.insertUser(form)
+                //关闭弹窗并初始化数据
+                closeLogin()
                 //提示用户注册成功
                 proxy.$message({ message: '注册成功', type: 'success' })
             } else {
@@ -175,14 +198,14 @@ const submit = async () => {
 
 
 //更新用户信息
-const updateUser = async() => {
+const updateUser = async () => {
     //信息校验
     if (userData.username === '' || userData.password === '') {
         //提示用户注册失败
         return proxy.$message({ message: '密码不能为空', type: 'error' })
     }
     //如果上传了图片
-    if (userData.imgurl) {
+    if (imgurl.value) {
         //将图片转为二进制
         const formData = new FormData()
         formData.append('file', document.getElementById("file").files[0])
@@ -190,19 +213,39 @@ const updateUser = async() => {
         const uploadResult = await proxy.$api.profile(formData)
         userData.imgurl = uploadResult.data
     }
-    //更新用户
-    const updateResult = await proxy.$api.updateUser(userData)
-    //重新获取用户
-    const result = await proxy.$api.findUserByUserName(userData)
-    Object.assign(userData, result.data.message[0])
+    //发送更新用户请求
+    await proxy.$api.updateUser(userData)
+    //重新获取用户信息
+    getUserInfo()
+    //更新仓库中用户信息
+    store.commit('updateUserInfo', JSON.stringify({
+        username: userData.username,
+        imgurl: userData.imgurl,
+    }))
     //关闭弹窗
     emit('toLogin', false)
     //提示用户
     proxy.$message({ message: '修改成功', type: 'success' })
 }
 
+//重新获取用户信息
+const getUserInfo = async () => {
+    //用户已经登录
+    if (token) {
+        //重新获取用户
+        const result = await proxy.$api.findUserByUserName(JSON.parse(userInfo.value))
+        Object.assign(userData, result.data.message[0])
+    }
+}
+
+
 </script>
 <style lang='less'>
+.cleardark {
+    // 取消样式反转
+    filter: invert(1) hue-rotate(180deg);
+}
+
 .user {
     .login {
         width: 220px;

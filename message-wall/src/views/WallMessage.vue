@@ -44,15 +44,16 @@
             </div>
             <!-- 弹窗 -->
             <popup :title="store.state.popup.title" :class="{ cleardark: isDark }">
-                <create-card v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList"
+                <create-card :isDark="isDark" v-if="store.state.popup.selectedCard === -1" @getCardList="getCardList"
                     @initCardList="selectNote" />
-                <detail :card="cardList[store.state.popup.selectedCard]" :comments="comments" @updateList="updateList"
-                    v-else />
+                <detail :isDark="isDark" :card="cardList[store.state.popup.selectedCard]" :comments="comments"
+                    @updateList="updateList" v-else />
             </popup>
             <!-- 大图预览 -->
             <photo-preview :isDark="isDark" :photos="photoList" v-show="store.state.popup.isView" />
             <!-- 用户登录 -->
-            <login v-show="isLogin" class="message-login" @toLogin="toLogin" :class="{ cleardark: isDark }" />
+            <login :isDark="isDark" v-if="isLogin" class="message-login" @toLogin="toLogin"
+                :class="{ cleardark: isDark }" />
         </div>
     </div>
 </template>
@@ -60,7 +61,7 @@
 <script setup>
 import lottie from 'lottie-web'
 import loadingFile from '../assets/images/loading.json';
-import { getAssetURL } from '../utils/customize'
+import { getAssetURL, ipTo10DigitNumber } from '../utils/customize'
 import { note, photo } from '../../mock/index'
 import { wallType, label, noneTip } from '../utils/data'
 import TopBar from '../components/TopBar.vue';
@@ -119,6 +120,9 @@ const isDark = ref(false)
 
 //用户登录弹窗开关
 const isLogin = computed(() => store.state.popup.isLogin)
+
+//用户信息
+const userInfo = computed(() => store.state.popup.userInfo)
 
 //挂载
 onMounted(() => {
@@ -245,7 +249,7 @@ const getCardList = async () => {
             pagesize: pagesize.value,
             type: parseInt(wallId.value),
             label: selectedLable.value,
-            userId: localStorage.getItem('user')
+            userId: JSON.parse(userInfo.value).username
         }
         //发送请求
         const { data } = await proxy.$api.findWallPage(params)
@@ -278,15 +282,17 @@ const getCardList = async () => {
 }
 
 //获取用户
-const getUser = () => {
+const getUser = async () => {
     //没有token
     if (!store.state.popup.token) {
+        //获取ip地址并加密
+        const { data } = await proxy.$api.getIp()
         //生成游客信息并存入浏览器
         const userInfo = {
-            username: '游客' + Math.floor(Math.random() * 100000000),
+            username: '游客' + ipTo10DigitNumber(data.message),
             imgurl: Math.floor(Math.random() * 14),
         }
-        store.commit('updateUserInfo', JSON.stringify(userInfo)) 
+        store.commit('updateUserInfo', JSON.stringify(userInfo))
     }
 }
 

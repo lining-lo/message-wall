@@ -16,12 +16,12 @@
                     <use xlink:href="#icon-xiugai"></use>
                 </svg>
             </div>
-            <div class="upload-img">
-                <img :src="data.imgurl">
+            <div class="upload-img" v-if="data.imgurl">
+                <img :class="{ cleardark: isDark }" :src="data.imgurl">
             </div>
         </div>
         <!-- 留言卡片 -->
-        <div class="card-main" :style="{ background: wallId === '0' ? cardColor[data.color] : cardColor[5] }">
+        <div  class="card-main" :style="{ background: wallId === '0' ? cardColor[data.color] : cardColor[5] }">
             <textarea class="text" v-model="data.message" placeholder="留言..." maxlength="96"></textarea>
             <input class="name" v-model="data.name" type="text" placeholder="作者" readonly>
         </div>
@@ -58,9 +58,11 @@ import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex';
 
-
 //获取当前vue实例
 const { proxy } = getCurrentInstance()
+
+//获取父组件的参数
+const props = defineProps(['isDark'])
 
 //获取父组件的自定义事件
 const emit = defineEmits(['getCardList', 'initCardList'])
@@ -74,6 +76,9 @@ const store = useStore()
 //墙的类型(0留言,1照片)
 const wallId = computed(() => route.query.id || '0')
 
+//用户信息
+const userInfo = computed(() => store.state.popup.userInfo)
+
 //卡片数据
 const data = reactive({
     //卡片类型(0留言1照片)
@@ -81,9 +86,9 @@ const data = reactive({
     //卡片信息
     message: '',
     //留言者
-    name: localStorage.getItem('user'),
+    name: JSON.parse(userInfo.value).username,
     //用户id
-    userId: localStorage.getItem('user'),
+    userId: JSON.parse(userInfo.value).username,
     //创建时间
     moment: new Date(),
     //选择的卡片标签
@@ -156,6 +161,11 @@ const submit = async () => {
 
 </script>
 <style lang='less' scoped>
+.cleardark {
+    // 取消样式反转
+    filter: invert(1) hue-rotate(180deg);
+}
+
 .create-card {
     padding: 0 @padding-20 120px;
     position: relative;

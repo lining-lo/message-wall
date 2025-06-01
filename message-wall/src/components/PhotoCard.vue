@@ -12,7 +12,8 @@
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance } from 'vue'
+import { ref, reactive, getCurrentInstance, computed } from 'vue'
+import { useStore } from 'vuex';
 
 //获取当前vue实例
 const { proxy } = getCurrentInstance()
@@ -22,6 +23,12 @@ const props = defineProps(['photo'])
 
 //获取父组件传递的方法
 const emit = defineEmits(['toDetail'])
+
+//获取store实例
+const store = useStore()
+
+//用户信息
+const userInfo = computed(() => store.state.popup.userInfo)
 
 //点击卡片显示详情
 const toDetail = () => {
@@ -35,7 +42,7 @@ const addLike = async () => {
         //获取参数
         const data = {
             wallId: props.photo.id,
-            userId: localStorage.getItem('user'),
+            userId: JSON.parse(userInfo.value).username,
             type: 0,
             moment: new Date()
         }
