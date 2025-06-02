@@ -226,7 +226,19 @@ exports.findUserByUserNameAndPassword = (username, password) => {
 }
 
 //更新用户信息
-exports.updateUser = (username,password,email,imgurl,id)=>{
+exports.updateUser = (username, password, email, imgurl, id) => {
     const sql = `UPDATE user SET username = ?,password = ?,email = ?,imgurl = ? WHERE id = ?;`
-    return query(sql, [username,password,email,imgurl,id])
+    return query(sql, [username, password, email, imgurl, id])
+}
+
+//根据邮箱和用户名修改密码
+exports.updatePasswordByEmail = (password, username, email) => {
+    const sql = `UPDATE user SET password = ? WHERE username = ? and email=?;`
+    return query(sql, [password, username, email])
+}
+
+//根据用户名和邮箱查找用户
+exports.findUserByUserNameAndEmai = (username, email) => {
+    const sql = `SELECT * from user WHERE username = ? and email = ?;`
+    return query(sql, [username, email])
 }

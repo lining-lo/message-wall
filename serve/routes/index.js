@@ -61,4 +61,19 @@ module.exports = function (app) {
     app.post('/updateUser', (request, response) => {
         controller.updateUser(request, response)
     })
+
+    //获取ip
+    app.post('/getIp',(request,response)=>{
+        controller.getIp(request,response)
+    })
+
+    //根据邮箱和用户名修改密码
+    app.post('/updatePasswordByEmail',(request,response)=>{
+        controller.updatePasswordByEmail(request,response)
+    })
+
+    //根据用户名和邮箱查找用户
+    app.post('/findUserByUserNameAndEmai',(request,response)=>{
+        controller.findUserByUserNameAndEmai(request,response)
+    })
 }

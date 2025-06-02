@@ -22,6 +22,7 @@ app.use(cors())
 //引入路由
 require('./routes/index')(app)
 require('./routes/files')(app)
+require('./routes/email')(app)
 
 //设置静态资源位置
 app.use(express.static(__dirname + '/views'))

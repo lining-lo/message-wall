@@ -52,7 +52,22 @@ export default {
     },
 
     //获取ip
-    getIp(){
+    getIp() {
         return http.post('/getIp')
+    },
+
+    //发送邮箱
+    sendEmail(data) {
+        return http.post('/sendEmail', data)
+    },
+
+    //根据邮箱和用户名修改密码
+    updatePasswordByEmail(data) {
+        return http.post('/updatePasswordByEmail', data)
+    },
+
+    //根据用户名和邮箱查找用户
+    findUserByUserNameAndEmai(data) {
+        return http.post('/findUserByUserNameAndEmai', data)
     }
 }

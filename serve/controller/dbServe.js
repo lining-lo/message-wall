@@ -163,3 +163,35 @@ exports.updateUser = async (request, response) => {
         })
     })
 }
+
+//获取ip
+exports.getIp = async (request, response) => {
+    response.send({
+        code: 200,
+        message: request.ip
+    })
+}
+
+//根据邮箱和用户名修改密码
+exports.updatePasswordByEmail = async (request, response) => {
+    const data = request.body
+
+    await db.updatePasswordByEmail(data.password, data.username, data.email).then(result => {
+        response.send({
+            code: 200,
+            message: result
+        })
+    })
+}
+
+//根据用户名和邮箱查找用户
+exports.findUserByUserNameAndEmai = async (request, response) => {
+    const data = request.body
+
+    await db.findUserByUserNameAndEmai( data.username, data.email).then(result => {
+        response.send({
+            code: 200,
+            message: result
+        })
+    })
+}
